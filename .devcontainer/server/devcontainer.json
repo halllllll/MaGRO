@@ -1,0 +1,26 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/marcosgomesneto/bun-devcontainers/tree/main/src/basic-bun
+{
+	"name": "Backend Dev Env",
+	"dockerComposeFile": ["../../docker/dev/compose.dev.server.yaml"],
+	"service": "app",
+	"workspaceFolder": "/workspace/server", // 今回の設定だとworkspace/{実在するフォルダ}でコンテナが開く
+	// <none>:<none>許すまじ
+	"initializeCommand": "docker image prune -f",
+	"postAttachCommand": "git config --global --add safe.directory /workspace", // devcontainerから使う分にはフォルダ名はなんでもよさそう
+
+	// Configure tool-specific properties.
+	"customizations": {
+		// Configure properties specific to VS Code.
+		"vscode": {
+			"settings": {
+				"git.openRepositoryInParentFolders": "always"
+			},
+			// Add the IDs of extensions you want installed when the container is created.
+			"extensions": [
+				"golang.go",
+				"bierner.markdown-mermaid"
+			]
+		}
+	}
+}

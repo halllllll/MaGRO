@@ -1,0 +1,17 @@
+node_modules
+Dockerfile*
+docker-compose*
+.dockerignore
+.git
+.github
+.gitignore
+README.md
+LICENSE
+.vscode
+Makefile
+.env
+.editorconfig
+tmp
+static
+.devcontainer
+*.tar

@@ -1,0 +1,1 @@
+INSERT INTO system(version) VALUES('v0.0.0');
