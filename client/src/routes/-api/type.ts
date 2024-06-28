@@ -9,3 +9,8 @@ export type Info = {
   updated: Date;
   modified: Date;
 };
+
+export type Auth = {
+  userId: string | undefined;
+  idToken: string | undefined;
+};

@@ -1,10 +1,10 @@
-import { useAzureAuth } from '@/hooks/entraAuth';
+import { useEntraAuth } from '@/hooks/entraAuth';
 import { InteractionStatus } from '@azure/msal-browser';
 import { Box, Flex, Spinner, Text } from '@chakra-ui/react';
 import { type FC, useMemo } from 'react';
 
 export const MsalProcess: FC = () => {
-  const { inProgress } = useAzureAuth();
+  const { inProgress } = useEntraAuth();
   const message = useMemo(() => {
     switch (inProgress) {
       case InteractionStatus.Startup:
