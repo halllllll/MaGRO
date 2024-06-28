@@ -27,7 +27,6 @@ type SystemService interface {
 }
 
 type MaGROUnitService interface {
-	// TODO: いったん返さずrepositoryで結果を確認する
-	ListUnit(ctx context.Context, userId *entity.UserID) ([]*entity.Unit, error)
+	ListUnit(ctx context.Context) ([]*entity.Unit, error)
 	ListUsersSubunit(ctx context.Context, unitId *entity.UnitId) (*entity.RespUsersSubunit, error)
 }

@@ -12,6 +12,7 @@ type MagroSystem struct {
 }
 
 func (m *MagroSystem) GetSystemInfo(ctx context.Context) (*entity.System, error) {
+
 	info, err := m.Repo.GetSystemInfo(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to info: %w", err)

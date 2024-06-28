@@ -20,7 +20,6 @@ func (m *MagroSystem) GetSystemInfoHandler(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
 		})
-
 		return
 	}
 

@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"fmt"
 
+	"github.com/halllllll/MaGRO/auth"
 	"github.com/halllllll/MaGRO/entity"
 )
 
@@ -10,9 +12,15 @@ type ListUnit struct {
 	Repo MaGROLister
 }
 
-// TODO: いったん返さず確認する
-func (l *ListUnit) ListUnit(ctx context.Context, userid *entity.UserID) ([]*entity.Unit, error) {
-	result, err := l.Repo.ListUnits(ctx, userid)
+func (l *ListUnit) ListUnit(ctx context.Context) ([]*entity.Unit, error) {
+
+	id, ok := auth.GetUserID(ctx)
+	if !ok {
+		return nil, fmt.Errorf("user id not found")
+	}
+
+	result, err := l.Repo.ListUnits(ctx, &id)
+
 	if err != nil {
 		return nil, err
 	}
@@ -32,31 +40,6 @@ func (l *ListUnit) ListUsersSubunit(ctx context.Context, unitid *entity.UnitId) 
 	if err != nil {
 		return nil, err
 	}
-	// どういう情報になったらいい？
-	// ロイロをみてみよう
-	// 全体情報
-	// - currentUser
-	//		- id, name(学校), username,isAdmin
-	//		- school
-	//			- id, name（学校）,timezone, isXXXX系
-	//
-	// - school
-	//		- ↑と同じ内容
-	// - district
-	//	- 自治体とか,全体管理から設定されるデータっぽい(sso)
-	//
-	// ページごとの個別情報
-	// 生徒一覧
-	// 	- そのページのデータ
-	//    - 総ページ数・pagenation
-	//  - user_groups(array)
-	//  	- user data
-	//			- id, username, sort_key, displayname, schoolId
-	//			- user_groups(在籍してるやつ)（そのschoolIdのやつね）
-	//				- id, name,grade_string(学年), date情報
-	//  		↑がたくさん
-	//	- usertype
-	// 	- totalUsersCount
 	// TODO: 並列処理で取得・加工して返すAPI
 
 	var subunits []*entity.SubUnit

@@ -12,17 +12,7 @@ type MaGROUnitList struct {
 }
 
 func (lu *MaGROUnitList) ListUnit(ctx *gin.Context) {
-	// とりあえずDBで呼ぶだけ
-	var i struct {
-		UserID entity.UserID `json:"user_id" binding:"required"`
-	}
-	if err := ctx.ShouldBindJSON(&i); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"Message": err.Error(),
-		})
-		return
-	}
-	units, err := lu.Service.ListUnit(ctx, &i.UserID)
+	units, err := lu.Service.ListUnit(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
@@ -35,6 +25,8 @@ func (lu *MaGROUnitList) ListUnit(ctx *gin.Context) {
 	return
 }
 
+// TODO: GETなのでrequest bodyはない....
+// - あとで実装するときにちゃんとやる
 func (lu *MaGROUnitList) ListUsersSubunit(ctx *gin.Context) {
 	// とりあえずDBで呼ぶだけ
 	var i struct {

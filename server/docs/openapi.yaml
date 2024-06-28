@@ -1,16 +1,21 @@
-openapi: "3.0.3"
+openapi: "3.1.3"
 info:
   title: MaGRO
   description: MaGRO is Maikurosofuto Graph user account password Reset Operator 🐟
   version: "1.0.0"
 servers:
-  - url: http://{host}:{port}/api
-    description: "dev env (port number is defined code level)"
+  - url: http://{host}:{port}
+    description: |
+      - dev env (port number is defined code level) <br>
     variables:
       host:
         default: localhost
       port:
-        default: '24601'
+        default: '${port}'
+  - url: https://magro.sample.com
+    description: production
+
+
 tags:
   - name: History
     description: |
@@ -24,59 +29,104 @@ tags:
     description: |
       User data <br>
 paths:
-  /system/reset:
-    delete:
-      summary: Initialize system data
-      description: |
-        Initialize system data <br>
-        各データの削除の挙動<br>
-        - DBのテーブルを初期化
-          - 存在しない場合はエラーを返さず、再作成する
-      tags: [System]
-      operationId: Init
-      deprecated: false
-      requestBody:
-        $ref: "#/components/requestBodies/DeleteInitRequestBody"
-      responses:
-        2XX:
-          $ref: "#/components/responses/DeleteTargetResponse"
-        default:
-          $ref: "#/components/responses/500InternalServerError"
-  /system/entraid:
-    post:
-      summary: setup
-      description: |
-        setup app data <br>
-      tags: [System]
-      operationId: SetEntraIdInfo
-      deprecated: false
-      requestBody:
-        $ref: "#/components/requestBodies/PostInitRequestBody"
-      responses:
-        2XX:
-          $ref: "#/components/responses/SetEntraIdInfoResponse"
-        5XX:
-          $ref: "#/components/responses/500InternalServerError"
-        default:
-          $ref: "#/components/responses/500InternalServerError"
-  /entraid:
+  # /system/reset:
+  #   delete:
+  #     summary: Initialize system data
+  #     description: |
+  #       Initialize system data <br>
+  #       各データの削除の挙動<br>
+  #       - DBのテーブルを初期化
+  #         - 存在しない場合はエラーを返さず、再作成する
+  #     tags: [System]
+  #     operationId: Init
+  #     deprecated: false
+  #     requestBody:
+  #       $ref: "#/components/requestBodies/DeleteInitRequestBody"
+  #     responses:
+  #       2XX:
+  #         $ref: "#/components/responses/DeleteTargetResponse"
+  #       default:
+  #         $ref: "#/components/responses/500InternalServerError"
+  # /system/entraid:
+  #   post:
+  #     summary: setup
+  #     description: |
+  #       setup app data <br>
+  #     tags: [System]
+  #     operationId: SetEntraIdInfo
+  #     deprecated: false
+  #     requestBody:
+  #       $ref: "#/components/requestBodies/PostInitRequestBody"
+  #     responses:
+  #       2XX:
+  #         $ref: "#/components/responses/SetEntraIdInfoResponse"
+  #       5XX:
+  #         $ref: "#/components/responses/500InternalServerError"
+  #       default:
+  #         $ref: "#/components/responses/500InternalServerError"
+  # /entraid:
+  #   get:
+  #     summary: EntraID info
+  #     description: |
+  #       get MS EntraID data info <br>
+  #     tags: [System]
+  #     operationId: GetEntraIdInfo
+  #     deprecated: false
+  #     responses:
+  #       2XX:
+  #         $ref: "#/components/responses/GetEntraIdInfoResponse"
+  #       default:
+  #         $ref: "#/components/responses/500InternalServerError"
+  # /system/version:
+  #   get:
+  #     summary: version
+  #     description: |
+  #       get app version<br>
+  #     tags: [System]
+  #     operationId: GetVersion
+  #     deprecated: false
+  #     responses:
+  #       2XX:
+  #         $ref: "#/components/responses/VersionResponse"
+  #       default:
+  #         $ref: "#/components/responses/500InternalServerError"
+
+  
+  # /system/maintenance:
+  #   put:
+  #     summary: mentenance info
+  #     description: |
+  #       mentenance info <br>
+  #     tags: [System]
+  #     operationId: Init
+  #     deprecated: false
+  #     requestBody:
+  #       $ref: "#/components/requestBodies/SwitchMaintenanceModeRequestBody"
+  #     responses:
+  #       2XX:
+  #         $ref: "#/components/responses/MaintenanceResponse"
+  #       default:
+  #         $ref: "#/components/responses/500InternalServerError"
+  # /util/validateTemplate:
+  #   post:
+  #     summary: validation template xlsx file for chats
+  #     description: |
+  #       validation template xlsx file for chats <br>
+  #     tags: [System, Chat]
+  #     operationId: Validate Template
+  #     deprecated: false
+  #     requestBody:
+  #       $ref: "#/components/requestBodies/PostXlsxRequestBody"
+  #     responses:
+  #       2XX:
+  #         $ref: "#/components/responses/ValidateXlsxFileReponse"
+  #       default:
+  #         $ref: "#/components/responses/500InternalServerError"
+  /health:
     get:
-      summary: EntraID info
+      summary: app health
       description: |
-        get MS EntraID data info <br>
-      tags: [System]
-      operationId: GetEntraIdInfo
-      deprecated: false
-      responses:
-        2XX:
-          $ref: "#/components/responses/GetEntraIdInfoResponse"
-        default:
-          $ref: "#/components/responses/500InternalServerError"
-  /system/version:
-    get:
-      summary: version
-      description: |
-        get app version<br>
+        app version</br>
       tags: [System]
       operationId: GetVersion
       deprecated: false
@@ -85,65 +135,59 @@ paths:
           $ref: "#/components/responses/VersionResponse"
         default:
           $ref: "#/components/responses/500InternalServerError"
+  /api/units:
+    get:
+      summary: belongs units for user
+      description: |
+        belongs units for user
+      tags: [System, Units, User]
+      security:
+        - BearerAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/authUserData"
 
-  
-  /system/maintenance:
-    put:
-      summary: mentenance info
-      description: |
-        mentenance info <br>
-      tags: [System]
-      operationId: Init
-      deprecated: false
-      requestBody:
-        $ref: "#/components/requestBodies/SwitchMaintenanceModeRequestBody"
-      responses:
-        2XX:
-          $ref: "#/components/responses/MaintenanceResponse"
-        default:
-          $ref: "#/components/responses/500InternalServerError"
-  /util/validateTemplate:
-    post:
-      summary: validation template xlsx file for chats
-      description: |
-        validation template xlsx file for chats <br>
-      tags: [System, Chat]
-      operationId: Validate Template
-      deprecated: false
-      requestBody:
-        $ref: "#/components/requestBodies/PostXlsxRequestBody"
-      responses:
-        2XX:
-          $ref: "#/components/responses/ValidateXlsxFileReponse"
-        default:
-          $ref: "#/components/responses/500InternalServerError"
+
 components:
   schemas:
-    success_state:
-      type: string
-      enum:
-        - UPDATE
-        - CREATE
-    result_success:
-      type: boolean
-      default: true
-    system_mode:
-      type: string
-      enum:
-        - mentenance
-        - goon
+    entra_user:
+      type: object
+      properties:
+        id:
+          type: string
+          description: entra user id
+        account:
+          type: string
+          description: entra user account
+    # success_state:
+    #   type: string
+    #   enum:
+    #     - UPDATE
+    #     - CREATE
+    # result_success:
+    #   type: boolean
+    #   default: true
+    # system_mode:
+    #   type: string
+    #   enum:
+    #     - mentenance
+    #     - goon
     version_info:
       type: object
       properties:
-        name:
-          type: string
-          description: name
-          default: SURUME Local
-          example: app
         version:
-          type: integer
+          type: string
           description: version
-          example: 2
+          example: "v1.0.3"
+        created:
+          type: string
+          format: date-time
+          description: app created datetime
+          example: "2021-01-30T08:30:00Z"
+        modified:
+          type: string
+          format: date-time
+          description: app modified datetime
+          example: "2021-01-30T08:30:00Z"
     ErrorBase:
       type: object
       properties:
@@ -162,101 +206,132 @@ components:
         - success
         - message  
 
-    EntraIdInfo:
-      type: object
-      properties:
-        authority:
-          type: string
-          # format指定 format: ????
-          example: azure.sample.com
-        clientid:
-          type: string
-          # format指定 format: ????
-          example: xxxx-xxxx-xxxx-xxxx
-      required:
-        - authority
-        - clientid
-    InitTargetList:
-      type: array
-      items:
-        type: string
-        enum:
-          - entraid_info
-          - history
-    Init:
-      # 他にも追加するかもしれないので一応allofにしておく
-      allOf:
-        - properties:
-            target:
-              $ref: "#/components/schemas/InitTargetList"
-      required:
-        - target
-    XlsxFile:
-      type: object
-      properties:
-        filename:
-          type: string
-        file:
-          type: string
-          format: binary
-      required:
-        - file
-    ChatMessage:
-      type: object
-      properties:
-        to:
-          type: string
-        content:
-          type: string
-      required:
-        - to
-        - content
+    # EntraIdInfo:
+    #   type: object
+    #   properties:
+    #     authority:
+    #       type: string
+    #       # format指定 format: ????
+    #       example: azure.sample.com
+    #     clientid:
+    #       type: string
+    #       # format指定 format: ????
+    #       example: xxxx-xxxx-xxxx-xxxx
+    #   required:
+    #     - authority
+    #     - clientid
+    # InitTargetList:
+    #   type: array
+    #   items:
+    #     type: string
+    #     enum:
+    #       - entraid_info
+    #       - history
+    # Init:
+    #   # 他にも追加するかもしれないので一応allofにしておく
+    #   allOf:
+    #     - properties:
+    #         target:
+    #           $ref: "#/components/schemas/InitTargetList"
+    #   required:
+    #     - target
+    # XlsxFile:
+    #   type: object
+    #   properties:
+    #     filename:
+    #       type: string
+    #     file:
+    #       type: string
+    #       format: binary
+    #   required:
+    #     - file
+    # ChatMessage:
+    #   type: object
+    #   properties:
+    #     to:
+    #       type: string
+    #     content:
+    #       type: string
+    #   required:
+    #     - to
+    #     - content
 
-  requestBodies:
-    DeleteInitRequestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Init"
-    PostInitRequestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/EntraIdInfo"
+  requestBodies:  
+    # DeleteInitRequestBody:
+    #   required: true
+    #   content:
+    #     application/json:
+    #       schema:
+    #         $ref: "#/components/schemas/Init"
+    # PostInitRequestBody:
+    #   required: true
+    #   content:
+    #     application/json:
+    #       schema:
+    #         $ref: "#/components/schemas/EntraIdInfo"
     
-    SwitchMaintenanceModeRequestBody:
+    # SwitchMaintenanceModeRequestBody:
+    #   required: true
+    #   content:
+    #     application/json:
+    #       schema:
+    #         type: object
+    #         properties:
+    #           mode:
+    #             $ref: "#/components/schemas/system_mode"
+    #         required:
+    #           - mode
+    # PostXlsxRequestBody:
+    #   required: true
+    #   content:
+    #     multipart/form-data:
+    #       schema:
+    #         $ref: "#/components/schemas/XlsxFile"
+    authUserData:
       required: true
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              mode:
-                $ref: "#/components/schemas/system_mode"
-            required:
-              - mode
-    PostXlsxRequestBody:
-      required: true
-      content:
-        multipart/form-data:
-          schema:
-            $ref: "#/components/schemas/XlsxFile"
+            $ref: "#/components/schemas/entra_user"
+            
+
+    # UnitsByUser:
+    #   required: true
+    #   content:
+    #     application/json:
+    #       schemas:
+    #         type: object
+    #         properties:
+    #           userid
+
           
   responses:
-    DeleteTargetResponse:
-      description: success operation
+    health:
+      description: app health check
       content:
         application/json:
           schema:
             type: object
             properties:
-              success:
-                type: boolean
-                default: true
+              status:
+                type: string
+              default:
+                ok
             required:
-              - success
+              - status
+
+    # DeleteTargetResponse:
+    #   description: success operation
+    #   content:
+    #     application/json:
+    #       schema:
+    #         type: object
+    #         properties:
+    #           success:
+    #             type: boolean
+    #             default: true
+    #         required:
+    #           - success
     VersionResponse:
       description: version
       content:
@@ -273,68 +348,68 @@ components:
               - success
               - data
 
-    SetEntraIdInfoResponse:
-      description: setting entra id info
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              success:
-                type: boolean
-                default: true
-              data:
-                $ref: "#/components/schemas/success_state"
-            required:
-              - success
-              - data
-    GetEntraIdInfoResponse:
-      description: todo
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              success:
-                type: boolean
-                default: true
-              data:
-                $ref: "#/components/schemas/EntraIdInfo"
-            required:
-              - success
-              - data
-    MaintenanceResponse:
-      description: ret
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              success:
-                type: boolean
-                default: true
-              mode:
-                $ref: "#/components/schemas/system_mode"
-            required:
-              - success
-              - mode
-    ValidateXlsxFileReponse:
-      description: validate xlsx
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              success:
-                type: boolean
-                default: true
-              data:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ChatMessage"
-            required:
-              - success
-              - data
+    # SetEntraIdInfoResponse:
+    #   description: setting entra id info
+    #   content:
+    #     application/json:
+    #       schema:
+    #         type: object
+    #         properties:
+    #           success:
+    #             type: boolean
+    #             default: true
+    #           data:
+    #             $ref: "#/components/schemas/success_state"
+    #         required:
+    #           - success
+    #           - data
+    # GetEntraIdInfoResponse:
+    #   description: todo
+    #   content:
+    #     application/json:
+    #       schema:
+    #         type: object
+    #         properties:
+    #           success:
+    #             type: boolean
+    #             default: true
+    #           data:
+    #             $ref: "#/components/schemas/EntraIdInfo"
+    #         required:
+    #           - success
+    #           - data
+    # MaintenanceResponse:
+    #   description: ret
+    #   content:
+    #     application/json:
+    #       schema:
+    #         type: object
+    #         properties:
+    #           success:
+    #             type: boolean
+    #             default: true
+    #           mode:
+    #             $ref: "#/components/schemas/system_mode"
+    #         required:
+    #           - success
+    #           - mode
+    # ValidateXlsxFileReponse:
+    #   description: validate xlsx
+    #   content:
+    #     application/json:
+    #       schema:
+    #         type: object
+    #         properties:
+    #           success:
+    #             type: boolean
+    #             default: true
+    #           data:
+    #             type: array
+    #             items:
+    #               $ref: "#/components/schemas/ChatMessage"
+    #         required:
+    #           - success
+    #           - data
     500InternalServerError:
       description: internal server error
       content:

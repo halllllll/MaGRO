@@ -5,18 +5,17 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/halllllll/MaGRO/handler"
-	"github.com/halllllll/MaGRO/middleware"
-
-	"github.com/halllllll/MaGRO/service"
-
+	"github.com/halllllll/MaGRO/auth"
 	"github.com/halllllll/MaGRO/config"
+	"github.com/halllllll/MaGRO/handler"
+	"github.com/halllllll/MaGRO/service"
 	"github.com/halllllll/MaGRO/store"
 )
 
 func NewMux(ctx context.Context, cfg *config.Config) (http.Handler, func(), error) {
 	// michiからginに移行
 	router := gin.Default()
+	router.ContextWithFallback = true
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 	// csrfはいったんおいておく
@@ -58,7 +57,7 @@ func NewMux(ctx context.Context, cfg *config.Config) (http.Handler, func(), erro
 		},
 	}
 
-	magro := router.Group("/api").Use(middleware.MsalAuthMiddleware(cfg.ClientId))
+	magro := router.Group("/api").Use(auth.MsalAuthMiddleware(cfg.ClientId))
 
 	magro.GET("/info", ms.GetSystemInfoHandler)
 

@@ -1,12 +1,14 @@
-package middleware
+package auth
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/halllllll/MaGRO/entity"
 	"github.com/lestrrat-go/jwx/v2/jwk"
 	"github.com/lestrrat-go/jwx/v2/jws"
 	"github.com/lestrrat-go/jwx/v2/jwt"
@@ -14,21 +16,38 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type authInfo struct {
-	IdToken string `json:"id_token,required"`
+type userIDKey struct{}
+type roleKey struct{}
+
+func GetUserID(ctx context.Context) (entity.UserID, bool) {
+	id, ok := ctx.Value(userIDKey{}).(entity.UserID)
+	return id, ok
+}
+
+func SetUserID(ctx context.Context, uid entity.UserID) context.Context {
+	return context.WithValue(ctx, userIDKey{}, uid)
+}
+
+func SetRole(ctx context.Context, role entity.Role) context.Context {
+	return context.WithValue(ctx, roleKey{}, role)
+}
+
+func GetRole(ctx context.Context) (string, bool) {
+	role, ok := ctx.Value(roleKey{}).(string)
+	return role, ok
+}
+
+func IsAdmin(ctx context.Context) bool {
+	role, ok := GetRole(ctx)
+	if !ok {
+		return false
+	}
+	return role == string(entity.RoleAdmin)
 }
 
 func MsalAuthMiddleware(clientId string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		// var a *authInfo
-		// if err := ctx.BindJSON(&a); err != nil {
-		// 	ctx.JSON(http.StatusNotAcceptable, gin.H{
-		// 		"message": "invalid",
-		// 	})
-		// 	ctx.Abort()
 
-		// 	return
-		// }
 		reqTokens := ctx.Request.Header["Authorization"]
 		if len(reqTokens) == 0 {
 			ctx.JSON(http.StatusBadRequest, gin.H{
@@ -137,6 +156,31 @@ func MsalAuthMiddleware(clientId string) gin.HandlerFunc {
 		fmt.Printf("sub: %s\n", tok.Subject())
 		fmt.Printf("jti: %s\n", tok.JwtID())
 
-		return
+		// for azure entra id user account
+		preferred_username, ok := tok.Get("preferred_username")
+
+		if !ok {
+			fmt.Println("nothing field `preferred_username`")
+		} else {
+			str_username := fmt.Sprintf("%v", preferred_username)
+			id, ok := GetUserID(ctx)
+			if !ok {
+				// 登録する
+				// ginのContextとginのRequest.Contextがある + SetUserIDは素のnet/httpを扱うことにしているのでややこしい。基本的に素のContext単体の世界で考えるようにする
+				_tmpCtx := SetUserID(ctx.Request.Context(), entity.UserID(str_username))
+				// WARN: RequestとContextの置き換えで意図せぬ上書きや抜け落ちがあるかもしれない
+				ctx.Request = ctx.Request.WithContext(_tmpCtx)
+
+			} else if id != entity.UserID(str_username) {
+				ctx.JSON(http.StatusUnauthorized, gin.H{
+					"error": fmt.Errorf("not match user id"),
+				})
+				ctx.Abort()
+				return
+			}
+
+		}
+		ctx.Next()
+		// return
 	}
 }
