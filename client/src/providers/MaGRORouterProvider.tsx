@@ -6,7 +6,7 @@ import { queryClient } from './QueryProvider';
 // new tanstack router instance
 const router = createRouter({
   routeTree,
-  defaultPreload: 'intent',
+  // defaultPreload: 'intent',
 });
 
 declare module '@tanstack/react-router' {
@@ -20,6 +20,7 @@ export const MaGRORouterProvider = () => {
   const ctx = {
     azAuth: useEntraAuth(),
     queryClient: queryClient,
+    // unit: useState<string | null>(null),
   };
 
   return <RouterProvider router={router} context={ctx} />;

@@ -18,6 +18,8 @@ import { Route as RedirectImport } from './routes/redirect'
 import { Route as LoginImport } from './routes/login'
 import { Route as IndexImport } from './routes/index'
 import { Route as UserIndexImport } from './routes/user/index'
+import { Route as UnitIndexImport } from './routes/unit/index'
+import { Route as UnitUnitIdRouteImport } from './routes/unit/$unitId/route'
 
 // Create Virtual Routes
 
@@ -52,6 +54,16 @@ const IndexRoute = IndexImport.update({
 
 const UserIndexRoute = UserIndexImport.update({
   path: '/user/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const UnitIndexRoute = UnitIndexImport.update({
+  path: '/unit/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const UnitUnitIdRouteRoute = UnitUnitIdRouteImport.update({
+  path: '/unit/$unitId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -94,6 +106,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutLazyImport
       parentRoute: typeof rootRoute
     }
+    '/unit/$unitId': {
+      id: '/unit/$unitId'
+      path: '/unit/$unitId'
+      fullPath: '/unit/$unitId'
+      preLoaderRoute: typeof UnitUnitIdRouteImport
+      parentRoute: typeof rootRoute
+    }
+    '/unit/': {
+      id: '/unit/'
+      path: '/unit'
+      fullPath: '/unit'
+      preLoaderRoute: typeof UnitIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/user/': {
       id: '/user/'
       path: '/user'
@@ -112,6 +138,8 @@ export const routeTree = rootRoute.addChildren({
   RedirectRoute,
   SelectunitRoute,
   AboutLazyRoute,
+  UnitUnitIdRouteRoute,
+  UnitIndexRoute,
   UserIndexRoute,
 })
 
@@ -128,6 +156,8 @@ export const routeTree = rootRoute.addChildren({
         "/redirect",
         "/select_unit",
         "/about",
+        "/unit/$unitId",
+        "/unit/",
         "/user/"
       ]
     },
@@ -145,6 +175,12 @@ export const routeTree = rootRoute.addChildren({
     },
     "/about": {
       "filePath": "about.lazy.tsx"
+    },
+    "/unit/$unitId": {
+      "filePath": "unit/$unitId/route.tsx"
+    },
+    "/unit/": {
+      "filePath": "unit/index.tsx"
     },
     "/user/": {
       "filePath": "user/index.tsx"

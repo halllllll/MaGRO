@@ -1,4 +1,4 @@
-import type { Info } from './type';
+import type { BelongUnitsResponse, Info } from './type';
 
 export const getMaGROInfo = async (IdToken: string | undefined): Promise<Info> => {
   const res = await fetch('/api/info', {
@@ -8,7 +8,6 @@ export const getMaGROInfo = async (IdToken: string | undefined): Promise<Info> =
       'Content-Type': 'application/json',
       Authorization: `Bearer ${IdToken}`,
     },
-    // body: JSON.stringify({}),
   });
   if (!res.ok) {
     throw new Error(`${res.status} ${res.statusText}`);
@@ -16,8 +15,8 @@ export const getMaGROInfo = async (IdToken: string | undefined): Promise<Info> =
   return await res.json();
 };
 
-export const getUnitsByUser = async (IdToken: string | undefined): Promise<Info> => {
-  const res = await fetch('/api/unit', {
+export const getUnitsByUser = async (IdToken: string | undefined): Promise<BelongUnitsResponse> => {
+  const res = await fetch('/api/units', {
     method: 'GET',
     mode: 'cors',
     headers: {

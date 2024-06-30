@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { getMaGROInfo, getUnitsByUser } from './functions';
 import { belongsUnitKeys, info } from './key';
 import type { Auth } from './type';
@@ -22,7 +22,7 @@ export const useGetMaGROInfo = (authData: Auth) => {
 export const useGetBelongingUnits = (authData: Auth) => {
   console.info("let's get units!");
 
-  const { data, isPending, isError, error } = useQuery({
+  const { data, isPending, isError, error } = useSuspenseQuery({
     staleTime: 0,
     gcTime: 300,
     queryFn: () => getUnitsByUser(authData.idToken),

@@ -1,4 +1,4 @@
 export type Unit = {
-  id: number;
+  unit_id: string;
   name: string;
 };

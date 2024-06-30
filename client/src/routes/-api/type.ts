@@ -1,8 +1,15 @@
 import type { Unit } from '@/entity/Unit';
 
-export type BelongUnits = {
-  units: Unit[];
-};
+export type BelongUnitsResponse =
+  | {
+      status: 'error';
+      message: 'string';
+    }
+  | {
+      status: 'success';
+      unit_count: number;
+      units: Unit[];
+    };
 
 export type Info = {
   version: string;

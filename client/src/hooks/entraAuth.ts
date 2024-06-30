@@ -9,6 +9,7 @@ import {
 import { useMsal, useIsAuthenticated } from '@azure/msal-react';
 import { useMemo, useCallback } from 'react';
 import { AppRequests } from './graphScope';
+import { RemoveUnitID } from '@/util/session';
 
 let tokenExpirationTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -36,6 +37,7 @@ export const useEntraAuth = () => {
     const accounts = instance.getAllAccounts();
     if (accounts.length > 0) {
       const account = accounts[0];
+      console.warn(`acc! ${account}`);
       instance.setActiveAccount(account);
       try {
         const response = await instance.acquireTokenSilent({
@@ -104,6 +106,7 @@ export const useEntraAuth = () => {
 
   const logoutAzure = useCallback(async () => {
     instance.logoutRedirect();
+    RemoveUnitID();
   }, [instance]);
 
   const refreshAccessToken = async (account: AccountInfo): Promise<void> => {
