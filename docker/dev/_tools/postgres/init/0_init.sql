@@ -1,14 +1,14 @@
--- DROP TABLE IF EXISTS app, system, "users", logs, unit, action, subunit, status, users_unit, users_subunit, role CASCADE;
+DROP TABLE IF EXISTS app, system, "users", logs, unit, action, subunit, status, users_unit, users_subunit, role CASCADE;
 
 CREATE TABLE IF NOT EXISTS system (
-  id SERIAL PRIMARY KEY,
+  id INTEGER GENERATED ALWAYS AS IDENTITY NOT NULL PRIMARY KEY,
   version VARCHAR(255) NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS app(
-  id SERIAL PRIMARY KEY,
+  id INTEGER GENERATED ALWAYS AS IDENTITY NOT NULL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   client_id VARCHAR(255) NOT NULL,
   unit_alias VARCHAR(255) NOT NULL,
@@ -20,7 +20,8 @@ COMMENT ON COLUMN app.subunit_alias IS 'display subgroup name. ex) 学部名';
 
 CREATE TABLE IF NOT EXISTS role(
   id INTEGER GENERATED ALWAYS AS IDENTITY NOT NULL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL UNIQUE
+  name VARCHAR(255) NOT NULL UNIQUE,
+  name_alias VARCHAR(255)
 );
 
 COMMENT ON COLUMN role.name IS 'roles. ex) "teacher", "student"';
@@ -46,8 +47,7 @@ CREATE TABLE IF NOT EXISTS "users"(
     REFERENCES role(id)
 );
 
-
-COMMENT ON COLUMN users.id IS 'object-id (immutable)';
+COMMENT ON COLUMN users.id IS 'uuid like object-id (immutable)';
 COMMENT ON COLUMN users.account_id IS 'user account id';
 
 
@@ -58,9 +58,11 @@ CREATE TABLE IF NOT EXISTS unit(
 
 CREATE TABLE IF NOT EXISTS "subunit"(
   id INTEGER GENERATED ALWAYS AS IDENTITY NOT NULL PRIMARY KEY,
-  unit_id INTEGER NOT NULL CHECK(unit_id > 0),
+  unit_id INTEGER NOT NULL,
   name VARCHAR(255) NOT NULL,
   public BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,  
   UNIQUE(unit_id, name),
   FOREIGN KEY(unit_id) REFERENCES unit(id)
 );

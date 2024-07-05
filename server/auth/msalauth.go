@@ -17,7 +17,6 @@ import (
 )
 
 type userIDKey struct{}
-type roleKey struct{}
 
 func GetUserID(ctx context.Context) (entity.UserID, bool) {
 	id, ok := ctx.Value(userIDKey{}).(entity.UserID)
@@ -28,29 +27,13 @@ func SetUserID(ctx context.Context, uid entity.UserID) context.Context {
 	return context.WithValue(ctx, userIDKey{}, uid)
 }
 
-func SetRole(ctx context.Context, role entity.Role) context.Context {
-	return context.WithValue(ctx, roleKey{}, role)
-}
-
-func GetRole(ctx context.Context) (string, bool) {
-	role, ok := ctx.Value(roleKey{}).(string)
-	return role, ok
-}
-
-func IsAdmin(ctx context.Context) bool {
-	role, ok := GetRole(ctx)
-	if !ok {
-		return false
-	}
-	return role == string(entity.RoleAdmin)
-}
-
 func MsalAuthMiddleware(clientId string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
 		reqTokens := ctx.Request.Header["Authorization"]
 		if len(reqTokens) == 0 {
 			ctx.JSON(http.StatusBadRequest, gin.H{
+				"status":  entity.ER,
 				"message": "invalid token",
 			})
 			ctx.Abort()
@@ -59,12 +42,21 @@ func MsalAuthMiddleware(clientId string) gin.HandlerFunc {
 		reqToken := reqTokens[0]
 		if reqToken == "" {
 			ctx.JSON(http.StatusUnauthorized, gin.H{
+				"status":  entity.ER,
 				"message": "invalid token",
 			})
 			ctx.Abort()
 			return
 		}
 		idToken := strings.Replace(reqToken, "Bearer ", "", 1)
+		if idToken == "" {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"status":  entity.ER,
+				"message": "empty bearer",
+			})
+			ctx.Abort()
+			return
+		}
 
 		fmt.Printf("IdToken %s\n", idToken)
 
@@ -74,7 +66,8 @@ func MsalAuthMiddleware(clientId string) gin.HandlerFunc {
 
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"error": err.Error(),
+				"status": entity.ER,
+				"error":  err.Error(),
 			})
 			ctx.Abort()
 
@@ -162,6 +155,7 @@ func MsalAuthMiddleware(clientId string) gin.HandlerFunc {
 		if !ok {
 			fmt.Println("nothing field `preferred_username`")
 		} else {
+			fmt.Printf("name: %s\n", preferred_username)
 			str_username := fmt.Sprintf("%v", preferred_username)
 			id, ok := GetUserID(ctx)
 			if !ok {
@@ -173,7 +167,8 @@ func MsalAuthMiddleware(clientId string) gin.HandlerFunc {
 
 			} else if id != entity.UserID(str_username) {
 				ctx.JSON(http.StatusUnauthorized, gin.H{
-					"error": fmt.Errorf("not match user id"),
+					"status": entity.ER,
+					"error":  fmt.Errorf("not match user id"),
 				})
 				ctx.Abort()
 				return

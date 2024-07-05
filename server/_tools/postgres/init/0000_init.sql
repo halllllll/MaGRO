@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS system (
 );
 
 CREATE TABLE IF NOT EXISTS app(
+  id INTEGER GENERATED ALWAYS AS IDENTITY NOT NULL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
   client_id VARCHAR(255) NOT NULL,
   unit_alias VARCHAR(255) NOT NULL,
@@ -46,8 +47,7 @@ CREATE TABLE IF NOT EXISTS "users"(
     REFERENCES role(id)
 );
 
-
-COMMENT ON COLUMN users.id IS 'object-id (immutable)';
+COMMENT ON COLUMN users.id IS 'uuid like object-id (immutable)';
 COMMENT ON COLUMN users.account_id IS 'user account id';
 
 

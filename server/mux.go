@@ -57,6 +57,10 @@ func NewMux(ctx context.Context, cfg *config.Config) (http.Handler, func(), erro
 		},
 	}
 
+	// 非ゲストアカウント用
+	// Middlewareでわけなくてもいい気がする(guestでやらせたいことをいい感じに分けたいが今のところguestはなにもできない)
+	ensureRegularAccount := auth.NewEnsureRegularAccountMiddleware(repo)
+
 	magro := router.Group("/api").Use(auth.MsalAuthMiddleware(cfg.ClientId))
 
 	magro.GET("/info", ms.GetSystemInfoHandler)
@@ -66,8 +70,11 @@ func NewMux(ctx context.Context, cfg *config.Config) (http.Handler, func(), erro
 			Repo: repo,
 		},
 	}
-	magro.GET("/units", mu.ListUnit)
-	magro.GET("/subunits", mu.ListUsersSubunit)
+
+	maguroRegular := magro.Use(ensureRegularAccount.EnsureRegularAccountMiddleWare())
+
+	maguroRegular.GET("/units", mu.ListUnit)
+	maguroRegular.GET("/subunit/:unit", mu.ListUsersSubunit)
 
 	ma := handler.MaGROAdmin{
 		MutateService: &service.MutateMAGRO{
@@ -75,7 +82,7 @@ func NewMux(ctx context.Context, cfg *config.Config) (http.Handler, func(), erro
 		},
 	}
 
-	magro.PUT("/role/new", ma.UpdateRoleNameHandler)
+	maguroRegular.PUT("/role/new", ma.UpdateRoleNameHandler)
 
 	return router, cleanup, err
 }

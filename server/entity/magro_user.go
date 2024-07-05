@@ -1,6 +1,7 @@
 package entity
 
 type UserID string
+type UserUUID string
 
 type RespCurrentUser struct {
 	UserID   UserID `json:"user_id"`
@@ -9,9 +10,10 @@ type RespCurrentUser struct {
 }
 
 type User struct {
-	UserID      UserID
-	UserName    string
+	UserID      UserUUID
+	UserName    UserID
 	DisplayName string
 	UserSortKey string
 	UserType    Role
+	Status      string
 }

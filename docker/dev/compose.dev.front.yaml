@@ -5,7 +5,7 @@ services:
       args:
         - BUN_IMAGE=${BUN_IMAGE}
       dockerfile: ./Dockerfile.dev.front
-    container_name: frontApp
+    container_name: MaGRO_front
     working_dir: /workspace/client
     environment:
       PROXY_PORT: ${DEV_PROXY_PORT}

@@ -7,7 +7,7 @@ WHERE u.account_id = $1; -- `u.account_id` for all account
 
 
 -- by unit id
--- name: GetUsersSubunits :many
+-- name: GetSubunitByUserID :many
 SELECT unit.name AS "unit", su.name AS "subunit", su.id AS "subunit_id",su.public AS "public", su.created_at, su.updated_at, users.id AS "user_id", users.account_id, users.name AS "user_name", users.kana AS "user_kananame", role.name AS "role", COALESCE(NULLIF(role.name_alias, ''), role.name) AS "role_alias"
 FROM (
     SELECT * FROM subunit WHERE unit_id = $1
@@ -19,6 +19,24 @@ INNER JOIN role ON users.role = role.id
 ORDER BY unit.name ASC, su.name ASC;
 
 
+-- name: GetSubunitsByUserUuIDAndUnitId :many
+SELECT un.name AS "unit", su.name AS "subunit", su.id AS "subunit_id",su.public AS "public", su.created_at, su.updated_at, users.id AS "user_id", users.account_id, users.name AS "user_name", users.kana AS "user_kananame", role.name AS "role", COALESCE(NULLIF(role.name_alias, ''), role.name) AS "role_alias"
+FROM users
+JOIN users_subunit AS u_s ON users.id = u_s.user_id
+JOIN subunit AS su ON u_s.subunit_id = su.id
+JOIN unit AS un ON un.id = su.unit_id
+JOIN role ON users.role = role.id
+WHERE su.id IN (
+  SELECT su2.id
+  FROM subunit AS su2
+  JOIN users_subunit AS u_s2 ON su2.id = u_s2.subunit_id
+  WHERE u_s2.user_id = $1
+)
+AND un.id = $2
+-- AND users.id != $1 自分は含むことにする
+ORDER BY un.name ASC, su.name ASC;
+
+
 -- for admin
 -- name: AggregateUnitInfo :many
 SELECT un.name AS "unit", COUNT(DISTINCT su.name) AS "subunit_count", COUNT(DISTINCT u_s.user_id) AS "user_count"
@@ -26,3 +44,7 @@ FROM unit AS un
 JOIN subunit AS su ON su.unit_id = un.id
 JOIN users_subunit AS u_s ON u_s.subunit_id = su.id
 GROUP BY un.id ORDER BY un.name;
+
+
+
+
