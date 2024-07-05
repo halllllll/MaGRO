@@ -1,7 +1,7 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { getMaGROInfo, getUnitsByUser } from './functions';
 import { belongsUnitKeys, info } from './key';
-import type { Auth } from './type';
+import type { BelongUnitsResponse, Auth } from './type';
 
 export const useGetMaGROInfo = (authData: Auth) => {
   console.log(authData);
@@ -22,14 +22,14 @@ export const useGetMaGROInfo = (authData: Auth) => {
 export const useGetBelongingUnits = (authData: Auth) => {
   console.info("let's get units!");
 
-  const { data, isPending, isError, error } = useSuspenseQuery({
+  const { data, isPending, isError, error } = useSuspenseQuery<BelongUnitsResponse /*APIError*/>({
     staleTime: 0,
     gcTime: 300,
     queryFn: () => getUnitsByUser(authData.idToken),
     queryKey: belongsUnitKeys.me(authData.userId),
   });
 
-  if (isError) throw error;
+  // if (isError) throw error;
 
-  return { data, isPending, isError };
+  return { data, isPending, isError, error };
 };

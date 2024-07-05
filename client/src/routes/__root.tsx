@@ -38,7 +38,11 @@ const RootComponent: FC = () => {
               <Box>
                 <Navigate to="/login" />
                 <Text as="i">
-                  "MaGRO" is Maikurosohuto Graph-api account-password Reset Operator 🐟
+                  "MaGRO" is{' '}
+                  <ruby>
+                    Maikurosohuto<rt>まいくろそふと</rt>
+                  </ruby>{' '}
+                  Graph-api account-password Reset Operator 🐟
                 </Text>
               </Box>
               <LoginBtn />

@@ -11,13 +11,21 @@ export type BelongUnitsResponse =
       units: Unit[];
     };
 
-export type Info = {
-  version: string;
-  updated: Date;
-  modified: Date;
-};
-
 export type Auth = {
   userId: string | undefined;
   idToken: string | undefined;
 };
+
+// interface ErrorOptions {
+//   cause?: Error;
+//   details?: unknown;
+// }
+
+// export class APIError extends Error {
+//   options?: ErrorOptions;
+//   constructor(message?: string, options?: ErrorOptions) {
+//     super(message);
+//     this.name = 'APIError';
+//     this.options = options;
+//   }
+// }

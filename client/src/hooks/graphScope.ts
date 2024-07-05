@@ -1,3 +1,3 @@
 export const AppRequests = {
-  scopes: ['user.read', 'directory.accessAsUser.All'],
+  scopes: ['user.read', 'user.readwrite.all', 'directory.accessAsUser.All'],
 };

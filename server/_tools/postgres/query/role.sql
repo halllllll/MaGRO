@@ -12,3 +12,6 @@ UPDATE role
 SET name_alias = COALESCE($1, name_alias)
 WHERE name = $2
 RETURNING *;
+
+-- name: UserRoleSet :many
+SELECT * FROM role;

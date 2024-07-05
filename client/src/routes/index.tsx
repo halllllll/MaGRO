@@ -2,7 +2,10 @@ import {
   createFileRoute,
   Link,
   redirect,
+  useLoaderData,
+  useLocation,
   useNavigate,
+  useParams,
   useRouteContext,
 } from '@tanstack/react-router';
 import { Box, Flex, IconButton, ListItem, Text, UnorderedList } from '@chakra-ui/react';
@@ -18,12 +21,18 @@ import { RepeatIcon } from '@chakra-ui/icons';
 const Component: FC = () => {
   const { IdToken, userId, acquireTokenSilent } = useEntraAuth();
   const navigate = useNavigate({ from: '/login' });
-  // TODO: まずはロール確認
+  const d = useLoaderData({ from: '/' });
+  console.log(`これはloaderでreturnしたデータだよ〜 ${JSON.stringify(d)}`);
 
+  // TODO: エラーハンドリング
   const { data } = useGetBelongingUnits({
     userId: userId,
     idToken: IdToken,
   });
+
+  console.log(`data! ${data}`);
+  console.dir(data);
+  console.warn(`idToken: \n${IdToken}`);
 
   // contextがほしいが..
   const ctx = useRouteContext({ from: '/' });
@@ -49,29 +58,38 @@ const Component: FC = () => {
     );
   }
 
-  console.log(`data! ${data}`);
-  console.dir(data);
-  console.warn(`idToken: \n${IdToken}`);
   if (data?.status === 'error') {
     throw new Error('something error');
   }
-  if (data?.unit_count === 1) {
-    // TODO: 諦めてリダイレクト先でもっかいリクエストを飛ばすことにしている
-    // (データの渡し方がわからないし存在するのかも不明)
-    SetUnitID(data.units[0].unit_id);
-    // cotextの更新の仕方がわからない
-    // ctx.unit[1](GetUnitID()); なくした
-    // componentの中だとthrow redirectじゃなくてnavidate?
-    navigate({
-      to: '/unit/$unitId',
-      params: {
-        unitId: data.units[0].unit_id,
-      },
-      replace: true,
-      resetScroll: true,
-    });
-  } else {
-  }
+  // TODO: 選択肢がひとつの場合はそのままリダイレクトしたいが、
+  // なぜかエラーが解決できないので、とりあえず単一であっても候補を選ばせることにする
+  /*
+  // if (data?.unit_count === 1) {
+  //   // TODO: 諦めてリダイレクト先でもっかいリクエストを飛ばすことにしている
+  //   // (データの渡し方がわからないし存在するのかも不明)
+  //   SetUnitID(data.units[0].unit_id);
+  //   // cotextの更新の仕方がわからない
+  //   // ctx.unit[1](GetUnitID()); なくした
+  //   // componentの中だとthrow redirectじゃなくてnavidate?
+  //   navigate({
+  //     to: '/unit/$unitId',
+  //     params: {
+  //       unitId: data.units[0].unit_id,
+  //     },
+  //     replace: true,
+  //     resetScroll: true,
+  //   });
+  //   // throwを使うとuncauht errorなる
+  //   // throw redirect({
+  //   //   to: '/unit/$unitId',
+  //   //   params: {
+  //   //     unitId: data.units[0].unit_id,
+  //   //   },
+  //   //   replace: true,
+  //   //   resetScroll: true,
+  //   // });
+  // }
+  */
 
   const onResetError = async () => {
     // TODO: 意味があるのかどうかわからない。
@@ -98,14 +116,14 @@ const Component: FC = () => {
                           <Link
                             to="/unit/$unitId"
                             params={{
-                              unitId: v.unit_id,
+                              unitId: v.unit_id.toString(),
                             }}
                             key={v.unit_id}
                           >
                             <ListItem
                               key={v.unit_id}
                               onClick={() => {
-                                SetUnitID(v.unit_id);
+                                SetUnitID(v.unit_id.toString());
                               }}
                             >
                               {v.name}
@@ -161,9 +179,12 @@ export const Route = createFileRoute('/')({
     // get user msal data
     // なぜかcontextがないと言われてしまうのでbeforeloadに移動した
     // const { acquireTokenSilent } = context.azAuth;
-    // console.warn('uouo~~~');
     // await acquireTokenSilent();
     // hookは使えないけど直截fetchするならOKだろう
+
+    // ロール確認のデータをここで取得したい(cacheする必要のないデータ)
+    // componentではuseLoaderDataで取得できる
+    return { message: 'dayo~!!!', pororon: 'ぺろ〜ん' };
   },
 
   pendingComponent: () => {

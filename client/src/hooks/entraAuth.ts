@@ -30,14 +30,13 @@ export const useEntraAuth = () => {
   }, [instance]);
 
   // retrieve silent token
-  // ex: (from invoke GET ACCESS TOKEN): const accessToken = await msAuth.acquireTokenSilent();
+  // ex: (from invoke GET ACCESS TOKEN): const accessToken = await useEntraAuth.acquireTokenSilent();
   const acquireTokenSilent = useCallback(async (): Promise<string | null> => {
     // TODO: AuthErrorになったときの挙動確認（IdTokenがExpireされてたら再ログインを促したい）
     console.warn('更新にチャレンジ！');
     const accounts = instance.getAllAccounts();
     if (accounts.length > 0) {
       const account = accounts[0];
-      console.warn(`acc! ${account}`);
       instance.setActiveAccount(account);
       try {
         const response = await instance.acquireTokenSilent({
