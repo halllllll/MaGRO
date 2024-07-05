@@ -49,14 +49,28 @@ func (q *Queries) AddUser(ctx context.Context, arg AddUserParams) (User, error) 
 	return i, err
 }
 
-const getUser = `-- name: GetUser :one
-SELECT id, account_id, name, kana, role, status, created_at, updated_at FROM users
-WHERE id = $1
+const getUserByUUID = `-- name: GetUserByUUID :one
+SELECT users.id, users.account_id, users.name, users.kana, role.name AS "role", status.name AS "status", users.created_at, users.updated_at
+FROM users
+JOIN role ON role.id = users.role
+JOIN status ON role.id = status.id
+WHERE users.id = $1
 `
 
-func (q *Queries) GetUser(ctx context.Context, id string) (User, error) {
-	row := q.db.QueryRow(ctx, getUser, id)
-	var i User
+type GetUserByUUIDRow struct {
+	ID        string    `db:"id" json:"id"`
+	AccountID string    `db:"account_id" json:"account_id"`
+	Name      string    `db:"name" json:"name"`
+	Kana      *string   `db:"kana" json:"kana"`
+	Role      string    `db:"role" json:"role"`
+	Status    string    `db:"status" json:"status"`
+	CreatedAt time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
+}
+
+func (q *Queries) GetUserByUUID(ctx context.Context, id string) (GetUserByUUIDRow, error) {
+	row := q.db.QueryRow(ctx, getUserByUUID, id)
+	var i GetUserByUUIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.AccountID,
@@ -70,13 +84,31 @@ func (q *Queries) GetUser(ctx context.Context, id string) (User, error) {
 	return i, err
 }
 
-const getUserByRole = `-- name: GetUserByRole :many
+const getUserRole = `-- name: GetUserRole :one
+SELECT u.account_id, u.name, r.name AS "role"
+FROM users AS u JOIN role AS r ON u.role = r.id WHERE u.id = $1
+`
+
+type GetUserRoleRow struct {
+	AccountID string `db:"account_id" json:"account_id"`
+	Name      string `db:"name" json:"name"`
+	Role      string `db:"role" json:"role"`
+}
+
+func (q *Queries) GetUserRole(ctx context.Context, id string) (GetUserRoleRow, error) {
+	row := q.db.QueryRow(ctx, getUserRole, id)
+	var i GetUserRoleRow
+	err := row.Scan(&i.AccountID, &i.Name, &i.Role)
+	return i, err
+}
+
+const listUsersByRole = `-- name: ListUsersByRole :many
 SELECT u.id, account_id, u.name, kana, role, status, created_at, updated_at, r.id, r.name, name_alias FROM users AS u
 INNER JOIN role AS r ON r.id = u.role
 WHERE r.name = $1
 `
 
-type GetUserByRoleRow struct {
+type ListUsersByRoleRow struct {
 	ID        string    `db:"id" json:"id"`
 	AccountID string    `db:"account_id" json:"account_id"`
 	Name      string    `db:"name" json:"name"`
@@ -90,15 +122,15 @@ type GetUserByRoleRow struct {
 	NameAlias *string   `db:"name_alias" json:"name_alias"`
 }
 
-func (q *Queries) GetUserByRole(ctx context.Context, name string) ([]GetUserByRoleRow, error) {
-	rows, err := q.db.Query(ctx, getUserByRole, name)
+func (q *Queries) ListUsersByRole(ctx context.Context, name string) ([]ListUsersByRoleRow, error) {
+	rows, err := q.db.Query(ctx, listUsersByRole, name)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []GetUserByRoleRow{}
+	items := []ListUsersByRoleRow{}
 	for rows.Next() {
-		var i GetUserByRoleRow
+		var i ListUsersByRoleRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.AccountID,
@@ -122,13 +154,13 @@ func (q *Queries) GetUserByRole(ctx context.Context, name string) ([]GetUserByRo
 	return items, nil
 }
 
-const getUserByStatus = `-- name: GetUserByStatus :many
-SELECT u.id, account_id, u.name, kana, role, status, created_at, updated_at, us.id, us.name FROM users AS u
-INNER JOIN users_status AS us ON us.id = u.status
-WHERE us.name = $1
+const listUsersByStatus = `-- name: ListUsersByStatus :many
+SELECT u.id, account_id, u.name, kana, role, status, created_at, updated_at, s.id, s.name FROM users AS u
+INNER JOIN status AS s ON s.id = u.status
+WHERE s.name = $1
 `
 
-type GetUserByStatusRow struct {
+type ListUsersByStatusRow struct {
 	ID        string    `db:"id" json:"id"`
 	AccountID string    `db:"account_id" json:"account_id"`
 	Name      string    `db:"name" json:"name"`
@@ -141,15 +173,15 @@ type GetUserByStatusRow struct {
 	Name_2    string    `db:"name_2" json:"name_2"`
 }
 
-func (q *Queries) GetUserByStatus(ctx context.Context, name string) ([]GetUserByStatusRow, error) {
-	rows, err := q.db.Query(ctx, getUserByStatus, name)
+func (q *Queries) ListUsersByStatus(ctx context.Context, name string) ([]ListUsersByStatusRow, error) {
+	rows, err := q.db.Query(ctx, listUsersByStatus, name)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	items := []GetUserByStatusRow{}
+	items := []ListUsersByStatusRow{}
 	for rows.Next() {
-		var i GetUserByStatusRow
+		var i ListUsersByStatusRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.AccountID,
@@ -170,6 +202,20 @@ func (q *Queries) GetUserByStatus(ctx context.Context, name string) ([]GetUserBy
 		return nil, err
 	}
 	return items, nil
+}
+
+const reverseLookupUUID = `-- name: ReverseLookupUUID :one
+SELECT users.id
+FROM users
+WHERE users.account_id = $1
+`
+
+// uuidから引く前提なので
+func (q *Queries) ReverseLookupUUID(ctx context.Context, accountID string) (string, error) {
+	row := q.db.QueryRow(ctx, reverseLookupUUID, accountID)
+	var id string
+	err := row.Scan(&id)
+	return id, err
 }
 
 const searchUserByAccountID = `-- name: SearchUserByAccountID :many

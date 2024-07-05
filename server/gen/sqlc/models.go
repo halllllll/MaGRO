@@ -37,6 +37,11 @@ type Role struct {
 	NameAlias *string `db:"name_alias" json:"name_alias"`
 }
 
+type Status struct {
+	ID   int32  `db:"id" json:"id"`
+	Name string `db:"name" json:"name"`
+}
+
 type Subunit struct {
 	ID        int32     `db:"id" json:"id"`
 	UnitID    int32     `db:"unit_id" json:"unit_id"`
@@ -77,11 +82,6 @@ type User struct {
 	Status    int32     `db:"status" json:"status"`
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
-}
-
-type UsersStatus struct {
-	ID   int32  `db:"id" json:"id"`
-	Name string `db:"name" json:"name"`
 }
 
 type UsersSubunit struct {

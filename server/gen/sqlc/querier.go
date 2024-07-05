@@ -18,28 +18,33 @@ type Querier interface {
 	AggregateUnitInfo(ctx context.Context) ([]AggregateUnitInfoRow, error)
 	CreateAction(ctx context.Context, name string) (Action, error)
 	CreateAppInfo(ctx context.Context, arg CreateAppInfoParams) (App, error)
-	CreateStatusName(ctx context.Context, name string) (UsersStatus, error)
+	CreateStatusName(ctx context.Context, name string) (Status, error)
 	GetAction(ctx context.Context, id int32) (Action, error)
 	// by user id
 	GetBelongsUnits(ctx context.Context, accountID string) ([]Unit, error)
 	GetRole(ctx context.Context, id int32) (Role, error)
-	GetStatusName(ctx context.Context, id int32) (UsersStatus, error)
-	GetSystemInfo(ctx context.Context) (System, error)
-	GetUnit(ctx context.Context, id int32) (Unit, error)
-	GetUser(ctx context.Context, id string) (User, error)
-	GetUserByRole(ctx context.Context, name string) ([]GetUserByRoleRow, error)
-	GetUserByStatus(ctx context.Context, name string) ([]GetUserByStatusRow, error)
+	GetStatusName(ctx context.Context, id int32) (Status, error)
 	// `u.account_id` for all account
 	// by unit id
-	GetUsersSubunits(ctx context.Context, unitID int32) ([]GetUsersSubunitsRow, error)
+	GetSubunitByUserID(ctx context.Context, unitID int32) ([]GetSubunitByUserIDRow, error)
+	// AND users.id != $1 自分は含むことにする
+	GetSubunitsByUserUuIDAndUnitId(ctx context.Context, arg GetSubunitsByUserUuIDAndUnitIdParams) ([]GetSubunitsByUserUuIDAndUnitIdRow, error)
+	GetSystemInfo(ctx context.Context) (System, error)
+	GetUnit(ctx context.Context, id int32) (Unit, error)
+	GetUserByUUID(ctx context.Context, id string) (GetUserByUUIDRow, error)
+	GetUserRole(ctx context.Context, id string) (GetUserRoleRow, error)
+	ListUsersByRole(ctx context.Context, name string) ([]ListUsersByRoleRow, error)
+	ListUsersByStatus(ctx context.Context, name string) ([]ListUsersByStatusRow, error)
 	MapUserSubunit(ctx context.Context, arg MapUserSubunitParams) error
 	MapUserUnit(ctx context.Context, arg MapUserUnitParams) error
+	// uuidから引く前提なので
+	ReverseLookupUUID(ctx context.Context, accountID string) (string, error)
 	SearchSubunitsByUnitId(ctx context.Context, unitID int32) ([]Subunit, error)
 	SearchUserByAccountID(ctx context.Context, dollar_1 *string) ([]User, error)
 	UpdateAction(ctx context.Context, arg UpdateActionParams) (Action, error)
 	UpdateApp(ctx context.Context, arg UpdateAppParams) (App, error)
 	UpdateRoleName(ctx context.Context, arg UpdateRoleNameParams) (Role, error)
-	UpdateStatusName(ctx context.Context, arg UpdateStatusNameParams) (UsersStatus, error)
+	UpdateStatusName(ctx context.Context, arg UpdateStatusNameParams) (Status, error)
 	// dockerイメージ作成時に初期データを読み込ませている
 	UpdateSystem(ctx context.Context, version string) (System, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
