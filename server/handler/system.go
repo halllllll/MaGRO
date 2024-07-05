@@ -18,11 +18,13 @@ func (m *MagroSystem) GetSystemInfoHandler(ctx *gin.Context) {
 	info, err := m.Service.GetSystemInfo(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"status":  entity.ER,
 			"message": err.Error(),
 		})
 		return
 	}
 
+	// status情報はつけないことにした（なんとなく
 	ctx.JSON(http.StatusOK, info)
 }
 
@@ -37,18 +39,21 @@ func (m *MaGROAdmin) UpdateRoleNameHandler(ctx *gin.Context) {
 	var req *entity.ReqNewRoleAlias
 	if err := ctx.BindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
+			"status":  entity.ER,
 			"message": err.Error(),
 		})
 		return
 	}
 	if err := m.MutateService.UpdateRole(ctx, req); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"status":  entity.ER,
 			"message": err.Error(),
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{
+		"status":  entity.OK,
 		"message": "renew",
 	})
 	return

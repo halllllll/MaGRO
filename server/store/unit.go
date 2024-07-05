@@ -16,12 +16,19 @@ func (r *Repository) ListUnits(ctx context.Context, id *entity.UserID) ([]db.Uni
 	return units, nil
 }
 
-func (r *Repository) ListUsersSubunits(ctx context.Context, unitid *entity.UnitId) ([]db.GetUsersSubunitsRow, error) {
-	uid := int32(*unitid)
-	result, err := r.query.GetUsersSubunits(ctx, uid)
+func (r *Repository) ListUsersSubunits(ctx context.Context, userUuid *entity.UserUUID, unitId *entity.UnitId) ([]db.GetSubunitsByUserUuIDAndUnitIdRow, error) {
+	unit_id := int32(*unitId)
+	user_uuid := string(*userUuid)
+
+	args := &db.GetSubunitsByUserUuIDAndUnitIdParams{
+		ID:     unit_id,   // unit id
+		UserID: user_uuid, // user uuid
+	}
+
+	result, err := r.query.GetSubunitsByUserUuIDAndUnitId(ctx, *args)
+	// TOOD: pgx.ErrNoRows handling
 	if err != nil {
 		return nil, err
 	}
-
 	return result, nil
 }

@@ -48,9 +48,9 @@ func (u *Upsert) LgateUpsert(ctx context.Context, target []*edu.LGateCSVOutput) 
 		var role model.MaGRORoleName
 		// var role edu.LGateRole
 		if v.IsStudent() {
-			role = model.RoleManager
-		} else {
 			role = model.RoleGuest
+		} else {
+			role = model.RoleManager
 		}
 		var role_id int
 

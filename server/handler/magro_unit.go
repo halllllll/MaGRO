@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"database/sql"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/halllllll/MaGRO/entity"
@@ -15,38 +17,63 @@ func (lu *MaGROUnitList) ListUnit(ctx *gin.Context) {
 	units, err := lu.Service.ListUnit(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
+			"status":  entity.ER,
 			"message": err.Error(),
 		})
 		return
 	}
-	ctx.JSON(http.StatusNotImplemented, gin.H{
-		"units": units,
-	})
+
+	// SPAなので諦める...?
+	// // 0の場合はフロント側でやれ
+	// if len(units) == 1 {
+	// 	// Subunit取得して返す
+	// 	ctx.JSON(http.StatusAccepted, gin.H{"message": "単一unitあとでsubunitを返す実装する"})
+	// 	return
+	// } else {
+	// 	resp := &entity.RespBelongUnits{
+	// 		Result:    entity.OK,
+	// 		UnitCount: len(units),
+	// 		Units:     units,
+	// 	}
+	// 	ctx.JSON(http.StatusAccepted, resp)
+	// 	return
+	// }
+	// ctx.JSON(http.StatusNotImplemented, gin.H{
+	// 	"units": units,
+	// })
+	// return
+
+	resp := &entity.RespBelongUnits{
+		Result:    entity.OK,
+		UnitCount: len(units),
+		Units:     units,
+	}
+	ctx.JSON(http.StatusAccepted, resp)
 	return
+
 }
 
-// TODO: GETなのでrequest bodyはない....
-// - あとで実装するときにちゃんとやる
 func (lu *MaGROUnitList) ListUsersSubunit(ctx *gin.Context) {
-	// とりあえずDBで呼ぶだけ
-	var i struct {
-		UnitID entity.UnitId `json:"unit_id" binding:"required"`
-	}
-	if err := ctx.ShouldBindJSON(&i); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
-		})
-		return
-	}
+	unit_id := ctx.Param("unit")
 
-	result, err := lu.Service.ListUsersSubunit(ctx, &i.UnitID)
+	int_unit_id, err := strconv.Atoi(unit_id)
+	result, err := lu.Service.ListUsersSubunit(ctx, (*entity.UnitId)(&int_unit_id))
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-		})
-		return
+		// TODO: ErrNoRowsのハンドリングはrepositoryでやるべきでは？
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"status":  entity.ER,
+				"message": "empty",
+			})
+			return
+		} else {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"status":  entity.ER,
+				"message": err.Error(),
+			})
+			return
+		}
 	}
-
 	ctx.JSON(http.StatusOK, gin.H{
 		"body": result,
 	})

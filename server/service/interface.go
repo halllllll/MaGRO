@@ -27,8 +27,9 @@ type Infoer interface {
 
 // TODO:
 type MaGROLister interface {
-	ListUnits(ctx context.Context, unitid *entity.UserID) ([]db.Unit, error)                        // いったん返さずDBで出力して確認する
-	ListUsersSubunits(ctx context.Context, userid *entity.UnitId) ([]db.GetUsersSubunitsRow, error) // 同じ
+	ListUnits(ctx context.Context, unitid *entity.UserID) ([]db.Unit, error)
+	Me(ctx context.Context, userId *entity.UserID) (*entity.UserUUID, error)
+	ListUsersSubunits(ctx context.Context, userUuid *entity.UserUUID, unitId *entity.UnitId) ([]db.GetSubunitsByUserUuIDAndUnitIdRow, error) // 同じ
 }
 
 type MaGROMutater interface {

@@ -28,5 +28,6 @@ type SystemService interface {
 
 type MaGROUnitService interface {
 	ListUnit(ctx context.Context) ([]*entity.Unit, error)
+
 	ListUsersSubunit(ctx context.Context, unitId *entity.UnitId) (*entity.RespUsersSubunit, error)
 }
