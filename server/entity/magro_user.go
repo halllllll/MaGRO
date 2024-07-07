@@ -10,10 +10,10 @@ type RespCurrentUser struct {
 }
 
 type User struct {
-	UserID      UserUUID
-	UserName    UserID
-	DisplayName string
-	UserSortKey string
-	UserType    Role
-	Status      string
+	UserID      UserUUID `json:"user_id"`
+	UserName    UserID   `json:"user_name"`
+	DisplayName string   `json:"user_displayname"`
+	UserSortKey string   `json:"user_sortkey"`
+	UserType    Role     `json:"user_role"`
+	Status      string   `json:"user_status"`
 }

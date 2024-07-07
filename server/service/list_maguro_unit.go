@@ -143,5 +143,6 @@ func (l *ListUnit) ListUsersSubunit(ctx context.Context, unitid *entity.UnitId) 
 	ret.UserCount = len(usersWithSubgroupIds)
 	ret.SubunitCount = len(subunits)
 
+	ret.Result = entity.OK // 逆にNGのときはいまんところない
 	return ret, nil
 }

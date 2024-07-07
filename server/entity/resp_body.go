@@ -17,8 +17,8 @@ type OperatorSubunits struct {
 }
 
 type UserWithSubgroups struct {
-	User
-	BelongsSubunit []SubunitId
+	User           `json:"user"`
+	BelongsSubunit []SubunitId `json:"subunit_ids"`
 }
 
 type RespUsersSubunit struct {

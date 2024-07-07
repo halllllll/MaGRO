@@ -71,10 +71,20 @@ func NewMux(ctx context.Context, cfg *config.Config) (http.Handler, func(), erro
 		},
 	}
 
+	// TODO: repass用	仮実装
+	mr := handler.MaGRORepass{
+		Service: &service.Repass{
+			Repo: repo,
+		},
+	}
+
 	maguroRegular := magro.Use(ensureRegularAccount.EnsureRegularAccountMiddleWare())
 
 	maguroRegular.GET("/units", mu.ListUnit)
 	maguroRegular.GET("/subunit/:unit", mu.ListUsersSubunit)
+
+	maguroRegular.POST("/units/:unit/repass", mr.Repass)
+
 
 	ma := handler.MaGROAdmin{
 		MutateService: &service.MutateMAGRO{

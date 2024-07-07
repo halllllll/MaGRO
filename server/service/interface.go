@@ -25,7 +25,6 @@ type Infoer interface {
 	GetSystemInfo(ctx context.Context) (*entity.System, error)
 }
 
-// TODO:
 type MaGROLister interface {
 	ListUnits(ctx context.Context, unitid *entity.UserID) ([]db.Unit, error)
 	Me(ctx context.Context, userId *entity.UserID) (*entity.UserUUID, error)
@@ -34,4 +33,9 @@ type MaGROLister interface {
 
 type MaGROMutater interface {
 	UpdateRole(ctx context.Context, roles *entity.ReqNewRoleAlias) error
+}
+
+// TODO: とりあえず中身を見るだけの仮実装 
+type MaGRORepasser interface{
+	Repass(ctx context.Context)
 }
