@@ -84,7 +84,7 @@ export const UsersSubunitsList: FC<Props> = ({ data, isSending }) => {
   const validCount = w?.filter((v) => !!v).length ?? 0;
   return (
     <>
-      <Text>{JSON.stringify(w)}</Text>
+      {/* <Text>{JSON.stringify(w)}</Text>  デバッグ用　*/}
       <Flex
         justifyContent={'right'}
         align={'center'}

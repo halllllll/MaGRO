@@ -9,6 +9,7 @@ export const LogoutBtn: FC = () => {
     <Button
       isLoading={InteractionStatus.Login === inProgress}
       disabled={InteractionStatus.Login === inProgress}
+      variant={"outline"}
       onClick={logoutAzure}
     >
       Logout
