@@ -3,9 +3,7 @@ import {
   Link,
   redirect,
   useLoaderData,
-  useLocation,
   useNavigate,
-  useParams,
   useRouteContext,
 } from '@tanstack/react-router';
 import { Box, Flex, IconButton, ListItem, Text, UnorderedList } from '@chakra-ui/react';

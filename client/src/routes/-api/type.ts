@@ -16,6 +16,12 @@ export type Auth = {
   idToken: string | undefined;
 };
 
+export type Info = {
+  version: string;
+  created: Date;
+  modified: Date;
+};
+
 // interface ErrorOptions {
 //   cause?: Error;
 //   details?: unknown;

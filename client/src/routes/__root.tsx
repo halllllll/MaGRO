@@ -6,7 +6,7 @@ import { Footer } from '@/routes/-components/Footer';
 import { LoginBtn } from '@/routes/-components/LoginButton';
 import { AuthenticatedTemplate, UnauthenticatedTemplate } from '@azure/msal-react';
 import { type QueryClient, QueryErrorResetBoundary } from '@tanstack/react-query';
-import { type FC, Suspense, type useState } from 'react';
+import { type FC, Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from '@/components/ErrorFollback';
 import { MsalProcess } from '@/components/MsalProcess';

@@ -1,50 +1,34 @@
 import { useEntraAuth } from '@/hooks/entraAuth';
 import { GetUnitID, RemoveUnitID } from '@/util/session';
-import { RepeatIcon } from '@chakra-ui/icons';
-import { Box, Flex, IconButton, Text } from '@chakra-ui/react';
 import {
-  Navigate,
   createFileRoute,
   redirect,
   useLocation,
   useParams,
   useRouteContext,
 } from '@tanstack/react-router';
-import type { FC } from 'react';
+import { Suspense, type FC } from 'react';
 import { useGetUnitData } from '../-api';
-import { UsersSubunitsListX } from '../-comopnents/list';
+import { Reflesh } from '../-comopnents/reflesh';
+import { Form } from '../-comopnents/Form';
+import { QueryErrorResetBoundary } from '@tanstack/react-query';
+import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorFallback } from '@/components/ErrorFollback';
+import { PageInfo } from '../-comopnents/pageInfo';
 
 const Component: FC = () => {
   const { IdToken, userId } = useEntraAuth();
   console.warn(`idtokenがほしいよ〜\n${IdToken}`);
   const unitId = useParams({ from: '/unit/$unitId', select: (params) => params.unitId });
   const ctx = useRouteContext({ from: '/unit/$unitId' });
+
   const loc = useLocation();
   console.log(`location? ${loc.pathname}`);
   if (!ctx) {
-    return (
-      <Box>
-        <Flex gap={'3'} align={'center'}>
-          <Text>情報を取得できませんでした。画面リロードを試してください</Text>
-          <IconButton
-            aria-label={'reload'}
-            variant={'outline'}
-            colorScheme={''}
-            size={'md'}
-            isRound={true}
-            icon={<RepeatIcon />}
-            mx={'2'}
-            onClick={() => {
-              Navigate({ to: loc.pathname, from: loc.pathname });
-            }}
-          />
-        </Flex>
-      </Box>
-    );
+    <Reflesh loc={loc} />;
   }
 
-  // TODO: コンポーネント内でuseSuspenseQueryでデータ取得（loaderだとキャッシュが残らない)
-
+  // コンポーネント内でuseSuspenseQueryでデータ取得（loaderだとキャッシュが残らない)
   const { data } = useGetUnitData({ userId: userId, idToken: IdToken }, Number.parseInt(unitId));
   console.warn('data!');
   console.dir(data);
@@ -58,8 +42,16 @@ const Component: FC = () => {
 
   return (
     <>
-      <div>Hello /unit/$unitId!これちゃうん？</div>
-      <UsersSubunitsListX data={data.data} />
+      <QueryErrorResetBoundary>
+        {({ reset }) => (
+          <ErrorBoundary FallbackComponent={ErrorFallback} onReset={reset}>
+            <Suspense fallback={<b>loading...</b>}>
+              <PageInfo />
+              <Form data={data.data}>{''}</Form>
+            </Suspense>
+          </ErrorBoundary>
+        )}
+      </QueryErrorResetBoundary>
     </>
   );
 };
