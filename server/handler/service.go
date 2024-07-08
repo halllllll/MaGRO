@@ -32,7 +32,6 @@ type MaGROUnitService interface {
 	ListUsersSubunit(ctx context.Context, unitId *entity.UnitId) (*entity.RespUsersSubunit, error)
 }
 
-// TODO: とりあえず受け取るだけの仮実装
-type MaGRORepassService interface{
-	RepassUser(ctx context.Context)
+type MaGRORepassService interface {
+	RepassUser(ctx context.Context, unitId *entity.UnitId, target []*entity.UserPrimaryUniqID) (*entity.RespRepass, error)
 }

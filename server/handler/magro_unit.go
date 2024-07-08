@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"database/sql"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -57,25 +57,36 @@ func (lu *MaGROUnitList) ListUsersSubunit(ctx *gin.Context) {
 	unit_id := ctx.Param("unit")
 
 	int_unit_id, err := strconv.Atoi(unit_id)
+	if err != nil{
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"status":  entity.ER,
+			"message": err.Error(),
+		})
+		return
+	}
 	result, err := lu.Service.ListUsersSubunit(ctx, (*entity.UnitId)(&int_unit_id))
 	if err != nil {
-		// TODO: ErrNoRowsのハンドリングはrepositoryでやるべきでは？
-		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"status":  entity.ER,
-				"message": "empty",
-			})
-			return
-		} else {
-			ctx.JSON(http.StatusInternalServerError, gin.H{
-				"status":  entity.ER,
-				"message": err.Error(),
-			})
-			return
-		}
+		// // TODO: ErrNoRowsのハンドリングはrepositoryでやるべきでは？
+		// -> どうせ空かも
+		// if err == sql.ErrNoRows {
+		// 	ctx.JSON(http.StatusInternalServerError, gin.H{
+		// 		"status":  entity.ER,
+		// 		"message": "empty",
+		// 	})
+		// 	return
+		// } else {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"status":  entity.ER,
+			"message": err.Error(),
+		})
+		return
 	}
+	fmt.Printf("unit id? %d\n", int_unit_id)
+	fmt.Println("まずこれちゃんと動いてるか確認やね")
+	fmt.Printf("%#v\n", result.CurrentUser)
 	ctx.JSON(http.StatusOK, gin.H{
-		"body": result,
+		"status": entity.OK,
+		"data":   result,
 	})
 	return
 }

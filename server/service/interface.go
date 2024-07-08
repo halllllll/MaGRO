@@ -25,17 +25,31 @@ type Infoer interface {
 	GetSystemInfo(ctx context.Context) (*entity.System, error)
 }
 
+type ListUsersSubunits interface{
+	ListUsersSubunits(ctx context.Context, userUuid *entity.UserUUID, unitId *entity.UnitId) ([]db.GetSubunitsByUserUuIDAndUnitIdRow, error) // 同じ
+}
+
+type Me interface{
+	Me(ctx context.Context, userId *entity.UserID) (*entity.UserUUID, error)
+}
+
 type MaGROLister interface {
 	ListUnits(ctx context.Context, unitid *entity.UserID) ([]db.Unit, error)
-	Me(ctx context.Context, userId *entity.UserID) (*entity.UserUUID, error)
-	ListUsersSubunits(ctx context.Context, userUuid *entity.UserUUID, unitId *entity.UnitId) ([]db.GetSubunitsByUserUuIDAndUnitIdRow, error) // 同じ
+	// Me(ctx context.Context, userId *entity.UserID) (*entity.UserUUID, error)
+	// ListUsersSubunits(ctx context.Context, userUuid *entity.UserUUID, unitId *entity.UnitId) ([]db.GetSubunitsByUserUuIDAndUnitIdRow, error) // 同じ
+	Me
+	ListUsersSubunits
 }
 
 type MaGROMutater interface {
 	UpdateRole(ctx context.Context, roles *entity.ReqNewRoleAlias) error
 }
 
-// TODO: とりあえず中身を見るだけの仮実装 
-type MaGRORepasser interface{
+type MaGRORepasser interface {
 	Repass(ctx context.Context)
+	// Me(ctx context.Context, userId *entity.UserID) (*entity.UserUUID, error)
+	// ListUsersSubunits(ctx context.Context, userUuid *entity.UserUUID, unitId *entity.UnitId) ([]db.GetSubunitsByUserUuIDAndUnitIdRow, error) // 同じ
+	Me
+	ListUsersSubunits
+
 }

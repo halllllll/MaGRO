@@ -36,3 +36,14 @@ type RespBelongUnits struct {
 	Units     []*Unit     `json:"units"`
 	UnitCount int         `json:"unit_count"`
 }
+
+// 失敗したやつはそれごとに理由をつける
+type RepassEveryResult struct {
+	User    User        `json:"user"`
+	Result  ResultLabel `json:"status"`
+	Message string      `json:"message"`
+	Issue   string      `json:"issue"`
+}
+type RespRepass struct {
+	Result []RepassEveryResult `json:"result"`
+}
