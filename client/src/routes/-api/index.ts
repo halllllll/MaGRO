@@ -4,9 +4,6 @@ import { belongsUnitKeys, info } from './key';
 import type { BelongUnitsResponse, Auth } from './type';
 
 export const useGetMaGROInfo = (authData: Auth) => {
-  console.log(authData);
-  console.info('GOGOGO~');
-
   const { data, isPending, isError, error } = useQuery({
     staleTime: 0,
     gcTime: 300,
@@ -20,8 +17,6 @@ export const useGetMaGROInfo = (authData: Auth) => {
 };
 
 export const useGetBelongingUnits = (authData: Auth) => {
-  console.info("let's get units!");
-
   const { data, isPending, isError, error } = useSuspenseQuery<BelongUnitsResponse /*APIError*/>({
     staleTime: 0,
     gcTime: 300,

@@ -7,7 +7,7 @@ import { useEntraAuth } from '@/hooks/entraAuth';
 const LoginComponent: FC = () => {
   const { isAuthenticated } = useEntraAuth();
   if (isAuthenticated) {
-    console.info('yes loged in!!!');
+    console.info('loged in');
     return <Navigate to="/" />;
   }
   return (

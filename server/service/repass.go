@@ -37,6 +37,8 @@ type Repass struct {
 
 */
 func (r *Repass) RepassUser(ctx context.Context, unitId *entity.UnitId, _target []*entity.UserPrimaryUniqID) (*entity.RespRepass, error) {
+	fmt.Println("repass action:")
+
 	// get access token
 	token, err := auth.GetAccessTokenBySecret(ctx)
 	if err != nil {
@@ -204,5 +206,7 @@ func repass(ctx context.Context, token string, password string, id entity.UserID
 	if resp.StatusCode != http.StatusNoContent{
 		return fmt.Errorf("%s", resp.Status)
 	}
+
+	fmt.Println("repass done;")
 	return nil
 }

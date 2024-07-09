@@ -34,7 +34,7 @@ type Props = {
   data: Map<string, User>;
 };
 
-export const ModalOutline: FC<Props> = (props) => {
+export const ConfirmModal: FC<Props> = (props) => {
   const { isOpen, onClose, data, onConfirm } = props;
 
   // checkbox formで選択したユーザーIDからユーザー情報を構築
@@ -79,7 +79,7 @@ export const ModalOutline: FC<Props> = (props) => {
                     </ListItem>
                     <ListItem>
                       <AlertDescription>
-                        新しいパスワードはサーバーで保存しません。
+                        新しいパスワードはサーバーで保存されません。
                       </AlertDescription>
                     </ListItem>
                     <AlertDescription>
@@ -90,12 +90,13 @@ export const ModalOutline: FC<Props> = (props) => {
               </Alert>
             </Box>
             <Box>
-              <TableContainer>
+              <TableContainer w={'100%'} whiteSpace={'unset'} overflowX="unset" overflowY="unset">
                 <Table variant="simple">
                   <Tbody>
                     {userIds
-                      .filter((v) => !!v) // false殺す
+                      .filter((v) => !!v) // false避け
                       .filter((v) => v !== undefined && v !== null) // なんか後続の処理でなぜかvが string | undefined | nullなため
+                      .filter((vv, ii, ss) => ss.indexOf(vv) === ii)
                       .map((v) => {
                         const user = data.get(v);
                         return (

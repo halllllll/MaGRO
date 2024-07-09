@@ -2,7 +2,6 @@ import {
   createFileRoute,
   Link,
   redirect,
-  useLoaderData,
   useNavigate,
   useRouteContext,
 } from '@tanstack/react-router';
@@ -19,8 +18,6 @@ import { RepeatIcon } from '@chakra-ui/icons';
 const Component: FC = () => {
   const { IdToken, userId, acquireTokenSilent } = useEntraAuth();
   const navigate = useNavigate({ from: '/login' });
-  const d = useLoaderData({ from: '/' });
-  console.log(`これはloaderでreturnしたデータだよ〜 ${JSON.stringify(d)}`);
 
   // TODO: エラーハンドリング
   const { data } = useGetBelongingUnits({
@@ -28,11 +25,7 @@ const Component: FC = () => {
     idToken: IdToken,
   });
 
-  console.log(`data! ${data}`);
-  console.dir(data);
-  console.warn(`idToken: \n${IdToken}`);
-
-  // contextがほしいが..
+  // contextがほしいがなぜかとれない（画面リロードで取れる）ことがある
   const ctx = useRouteContext({ from: '/' });
   if (!ctx) {
     return (
@@ -91,10 +84,12 @@ const Component: FC = () => {
 
   const onResetError = async () => {
     // TODO: 意味があるのかどうかわからない。
-    // -> Auth Errornのときは再ログインさせたい
-    console.log('reflesh!');
+    // -> Auth Errorのときは再ログインさせたい
     await acquireTokenSilent();
   };
+
+  const { unit } = ctx;
+  const [_, setUnitName] = unit;
 
   return (
     <>
@@ -103,7 +98,7 @@ const Component: FC = () => {
           <ErrorBoundary onReset={onResetError} FallbackComponent={ErrorFallback}>
             <Suspense fallback={<h2>fetching...</h2>}>
               {data.unit_count === 0 ? (
-                <>登録されているUnitはありません</>
+                <div>登録されているUnitはありません</div>
               ) : (
                 <>
                   <Box>
@@ -121,6 +116,7 @@ const Component: FC = () => {
                             <ListItem
                               key={v.unit_id}
                               onClick={() => {
+                                setUnitName(v.name);
                                 SetUnitID(v.unit_id.toString());
                               }}
                             >
@@ -148,12 +144,8 @@ export const Route = createFileRoute('/')({
   // https://github.com/TanStack/router/issues/1751
   beforeLoad: async ({ context }) => {
     if (!context) {
-      console.warn(`contextがねぇみたいだ！ in beforeloader ${context}`);
       return;
     }
-    console.warn(
-      `やったぜ！contextがあるみてぇだ！ in beforeloader ${context} ${JSON.stringify(context)}`,
-    );
     // なぜかloaderではcontextがないと言われてしまうのでこっちにもってきた
     const { acquireTokenSilent } = context.azAuth;
     await acquireTokenSilent();
@@ -172,17 +164,10 @@ export const Route = createFileRoute('/')({
   },
 
   loader: async ({ context: _context }) => {
-    // routerとqueryのテスト
     // 画面に関わることなのでcomponentにしようと思ったが、結果が一つの場合で分けたいので
-    // get user msal data
     // なぜかcontextがないと言われてしまうのでbeforeloadに移動した
-    // const { acquireTokenSilent } = context.azAuth;
-    // await acquireTokenSilent();
-    // hookは使えないけど直截fetchするならOKだろう
-
-    // ロール確認のデータをここで取得したい(cacheする必要のないデータ)
+    // TODO: サーバーでもやっているが、ロール確認のデータをここで取得したい(cacheする必要のないデータ)
     // componentではuseLoaderDataで取得できる
-    return { message: 'dayo~!!!', pororon: 'ぺろ〜ん' };
   },
 
   pendingComponent: () => {

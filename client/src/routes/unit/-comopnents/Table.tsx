@@ -81,7 +81,7 @@ export const UsersSubunitsList: FC<Props> = ({ data, isSending }) => {
   // rfh
   const { register, formState, watch } = useFormContext<SchemaType>();
   const w = watch('user_ids');
-  const validCount = w?.filter((v) => !!v).length ?? 0;
+  const validCount = w?.filter((v) => !!v).filter((e, i, s) => s.indexOf(e) === i).length ?? 0;
   return (
     <>
       {/* <Text>{JSON.stringify(w)}</Text>  デバッグ用　*/}
@@ -103,7 +103,6 @@ export const UsersSubunitsList: FC<Props> = ({ data, isSending }) => {
           isLoading={isSending}
           variant={'solid'}
           colorScheme={'teal'}
-          // isDisabled={!formState.isValid || formState.isSubmitting}
         >
           confirm
         </Button>
@@ -178,12 +177,12 @@ export const UsersSubunitsList: FC<Props> = ({ data, isSending }) => {
                   <Td fontSize={'xl'} colSpan={9999} height={'3.5rem'}>
                     <Flex gap={4}>
                       <Text>{r.data.subunit.name}</Text>
-                      <Text fontSize={'md'}>{`(${r.data.memberCount} member)`}</Text>
+                      <Text fontSize={'md'}>{`(count ${r.data.memberCount})`}</Text>
                     </Flex>
                   </Td>
                 </Tr>
               ) : (
-                <Tr key={`${idx}_${r.data.user_id}`}>
+                <Tr key={`${idx}_${r.data.user_id}`} _hover={{ bg: 'gray.100' }} height={'3rem'}>
                   <Td>
                     <Checkbox
                       {...register(`user_ids.${idx}`)}

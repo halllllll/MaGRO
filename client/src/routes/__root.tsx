@@ -6,7 +6,7 @@ import { Footer } from '@/routes/-components/Footer';
 import { LoginBtn } from '@/routes/-components/LoginButton';
 import { AuthenticatedTemplate, UnauthenticatedTemplate } from '@azure/msal-react';
 import { type QueryClient, QueryErrorResetBoundary } from '@tanstack/react-query';
-import { type FC, Suspense } from 'react';
+import { type FC, Suspense, type useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from '@/components/ErrorFollback';
 import { MsalProcess } from '@/components/MsalProcess';
@@ -15,7 +15,7 @@ import type { useEntraAuth } from '@/hooks/entraAuth';
 interface RouterContext {
   azAuth: ReturnType<typeof useEntraAuth>;
   queryClient: QueryClient;
-  // unit: ReturnType<typeof useState<string | null>>;
+  unit: ReturnType<typeof useState<string | null>>;
 }
 
 const RootComponent: FC = () => {
@@ -28,7 +28,6 @@ const RootComponent: FC = () => {
           xl: { overflow: 'auto' },
         }}
         width={{ base: '100%', xl: 'calc(100% - 22rem)' }}
-        padding="0 1rem"
       >
         <Container maxWidth="container.md" marginBottom="auto" px={'10'}>
           <Header />

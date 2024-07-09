@@ -2,6 +2,7 @@ import { useEntraAuth } from '@/hooks/entraAuth';
 import { routeTree } from '@/routeTree.gen';
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import { queryClient } from './QueryProvider';
+import { useState } from 'react';
 
 // new tanstack router instance
 const router = createRouter({
@@ -20,7 +21,7 @@ export const MaGRORouterProvider = () => {
   const ctx = {
     azAuth: useEntraAuth(),
     queryClient: queryClient,
-    // unit: useState<string | null>(null),
+    unit: useState<string | null>(null),
   };
 
   return <RouterProvider router={router} context={ctx} />;

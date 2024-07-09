@@ -33,7 +33,6 @@ export const useEntraAuth = () => {
   // ex: (from invoke GET ACCESS TOKEN): const accessToken = await useEntraAuth.acquireTokenSilent();
   const acquireTokenSilent = useCallback(async (): Promise<string | null> => {
     // TODO: AuthErrorになったときの挙動確認（IdTokenがExpireされてたら再ログインを促したい）
-    console.warn('更新にチャレンジ！');
     const accounts = instance.getAllAccounts();
     if (accounts.length > 0) {
       const account = accounts[0];
@@ -116,8 +115,11 @@ export const useEntraAuth = () => {
 
     try {
       // try silent reflesh
-      const response = await instance.acquireTokenSilent(silentRequest);
-      console.log('Refreshed Access Token:', response.accessToken);
+
+      // * if want get accesstoken, ↓
+      // const response = await instance.acquireTokenSilent(silentRequest);
+      // console.log('Refreshed Access Token:', response.accessToken);
+      await instance.acquireTokenSilent(silentRequest);
       setupTokenExpirationTimer();
     } catch (err) {
       // InteractionRequiredAuthError / BrowserAuthError エラーの場合、再度リダイレクトで認証させる
