@@ -18,6 +18,9 @@ type Config struct {
 	DBPassword string `env:"DB_PASSWORD,required"`
 	DBName     string `env:"DB_NAME,required"`
 	ClientId   string `env:"ENTRA_CLIENT_ID,required"`
+	// below 2 envs only for temporary implement untill asign entra app to user manager privilege
+	// ClientSecret string `env:"CLIENT_SECRET"`
+	// TenantId string `env:"TENANT_ID"`
 }
 
 func New() (*Config, error) {

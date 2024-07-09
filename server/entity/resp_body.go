@@ -7,10 +7,6 @@ const (
 	ER ResultLabel = "error"
 )
 
-// type Result struct {
-// 	Status ResultLabel `json:"status"`
-// }
-
 type OperatorSubunits struct {
 	Operators []*UserID `json:"operators"`
 	Subunit   *SubUnit  `json:"subunit"`
@@ -42,7 +38,7 @@ type RepassEveryResult struct {
 	User    User        `json:"user"`
 	Result  ResultLabel `json:"status"`
 	Message string      `json:"message"`
-	Issue   string      `json:"issue"`
+	Issue   string      `json:"password"`
 }
 type RespRepass struct {
 	Result []RepassEveryResult `json:"result"`

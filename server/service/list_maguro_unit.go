@@ -34,14 +34,13 @@ func (l *ListUnit) ListUnit(ctx context.Context) ([]*entity.Unit, error) {
 	return units, nil
 }
 
-// TODO: 中身を加工しよう
 func (l *ListUnit) ListUsersSubunit(ctx context.Context, unitid *entity.UnitId) (*entity.RespUsersSubunit, error) {
 	id, ok := auth.GetUserID(ctx)
 	if !ok {
 		return nil, fmt.Errorf("user id not found")
 	}
 
-	// まずidからlookupする必要があるよね
+	// まずidからlookupする必要がある
 	uuid, err := l.Repo.Me(ctx, &id)
 	if err != nil {
 		return nil, err
@@ -81,7 +80,7 @@ func (l *ListUnit) ListUsersSubunit(ctx context.Context, unitid *entity.UnitId) 
 	}
 
 	for _, v := range result {
-		fmt.Printf("%s, role %s\n", v.AccountID, v.RoleAlias)
+		// fmt.Printf("account id: %s, role %s\n", v.AccountID, v.RoleAlias)
 		if _, ok := subunitIdMap[int(v.SubunitID)]; !ok {
 			newSubunit := &entity.SubUnit{
 				SubunitID: entity.SubunitId(v.SubunitID),

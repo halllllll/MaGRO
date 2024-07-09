@@ -81,9 +81,7 @@ func (lu *MaGROUnitList) ListUsersSubunit(ctx *gin.Context) {
 		})
 		return
 	}
-	fmt.Printf("unit id? %d\n", int_unit_id)
-	fmt.Println("まずこれちゃんと動いてるか確認やね")
-	fmt.Printf("%#v\n", result.CurrentUser)
+	fmt.Printf("from unit id: %d\ncurrent user: %#v\n", int_unit_id, result.CurrentUser)
 	ctx.JSON(http.StatusOK, gin.H{
 		"status": entity.OK,
 		"data":   result,

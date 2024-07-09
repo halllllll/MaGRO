@@ -15,6 +15,10 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
       ENTRA_CLIENT_ID: ${ENTRA_CLIENT_ID} # クライアントから送られてきたIDトークンの検証に必要
+      # 👺 below 2 envs are ONLY temporary sinogi until entra app assign user manager 👹
+      CLIENT_SECRET: ${ENTRA_CLIENT_SECRET}
+      TENANT_ID: ${ENTRA_TENANT_ID}
+
     tty: true
     volumes:
       - ../..:/workspace:cached
@@ -54,8 +58,6 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-    # env_file: # TODO: environmentで使うものだけを列挙したほうがよさそう
-    #   - ../../.env
     healthcheck:
       test: pg_isready -U "${POSTGRES_USER:-postgres}" || exit 1
       interval: 10s

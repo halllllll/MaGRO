@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -35,9 +34,7 @@ func (rp *MaGRORepass) Repass(ctx *gin.Context) {
 		})
 		return
 	}
-	fmt.Printf("from unit: %d\n", int_unit_id)
 
-	// TODO: unit idとidtokenからの取得とか認証はServiceで使うが、とりあえず中身を見るだけの仮実装
 
 	var reqData []*entity.UserPrimaryUniqID
 	for _, v := range req.TargetUsers {
@@ -47,10 +44,17 @@ func (rp *MaGRORepass) Repass(ctx *gin.Context) {
 		})
 	}
 
-	rp.Service.RepassUser(ctx, (*entity.UnitId)(&int_unit_id), reqData)
+	result, err := rp.Service.RepassUser(ctx, (*entity.UnitId)(&int_unit_id), reqData)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"status":  entity.ER,
+			"message": err.Error(),
+		})
+		return
+	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"status":  entity.OK,
-		"message": "yes",
+		"body": result.Result,
 	})
 }

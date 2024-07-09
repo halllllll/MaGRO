@@ -58,7 +58,7 @@ func MsalAuthMiddleware(clientId string) gin.HandlerFunc {
 			return
 		}
 
-		fmt.Printf("IdToken %s\n", idToken)
+		// fmt.Printf("IdToken %s\n", idToken)
 
 		// TODO: 2回くらいまではチャレンジしてもいいかも
 		// check ms oidc
@@ -142,12 +142,12 @@ func MsalAuthMiddleware(clientId string) gin.HandlerFunc {
 			return
 		}
 
-		fmt.Println("Valid token")
-		fmt.Printf("iss: %s\n", tok.Issuer())
-		fmt.Printf("aud: %v\n", tok.Audience())
-		fmt.Printf("exp: %s\n", tok.Expiration())
-		fmt.Printf("sub: %s\n", tok.Subject())
-		fmt.Printf("jti: %s\n", tok.JwtID())
+		// fmt.Println("Valid token")
+		// fmt.Printf("iss: %s\n", tok.Issuer())
+		// fmt.Printf("aud: %v\n", tok.Audience())
+		// fmt.Printf("exp: %s\n", tok.Expiration())
+		// fmt.Printf("sub: %s\n", tok.Subject())
+		// fmt.Printf("jti: %s\n", tok.JwtID())
 
 		// for azure entra id user account
 		preferred_username, ok := tok.Get("preferred_username")
