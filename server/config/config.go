@@ -1,6 +1,10 @@
 package config
 
-import "github.com/caarlos0/env/v11"
+import (
+	"fmt"
+
+	"github.com/caarlos0/env/v11"
+)
 
 // env list
 type Env string
@@ -10,8 +14,14 @@ const (
 	EnvProductin   Env = "prod"
 )
 
+const (
+	GIN_DEBUG   Env = "debug"
+	GIN_RELEASE Env = "release"
+)
+
 type Config struct {
-	Env        Env    `env:"MAGRO_ENV" envDefault:"dev"`
+	// Env        Env    `env:"MAGRO_ENV" envDefault:"dev"`
+	Env        Env    `env:"GIN_MODE" envDefault:"debug"`
 	Port       int    `env:"GO_APP_PORT,required"`
 	DBPort     int    `env:"DBPORT,required"`
 	DBUser     string `env:"DB_USER,required"`
@@ -28,6 +38,9 @@ func New() (*Config, error) {
 	if err := env.Parse(cfg); err != nil {
 		return nil, err
 	}
+
+	fmt.Println("マジでPORT知りたい")
+	fmt.Printf("%d\n", cfg.Port)
 
 	return cfg, nil
 }

@@ -1,21 +1,23 @@
 include .env
 
+#  --platform ${PROD_PLATFORM} \
+
 build:
 	time DOCKER_BUILDKIT=1 docker build -f ./docker/Dockerfile.prod \
-	--platform ${PROD_PLATFORM} \
 	--progress=plain \
 	--build-arg FRONT_IMAGE=${BUN_IMAGE} \
 	--build-arg SERVER_1STSTAGE_IMAGE=${GO_DEV_IMAGE} \
   --build-arg SERVER_PROD_IMAGE=${GO_PROD_IMAGE} \
-	--build-arg GO_OS=${PROD_OS} \
-	--build-arg GO_ARCH=${PROD_ARCH} \
-	--build-arg GO_PROD_PLATFORM=${PROD_PLATFORM} \
-	--build-arg EXPOSE_PORT=${CONTAINER_PORT} \
+	--build-arg PROD_OS=${PROD_OS} \
+	--build-arg PROD_ARCH=${PROD_ARCH} \
+	--build-arg PROD_PLATFORM=${PROD_PLATFORM} \
 	--no-cache \
 	--force-rm \
 	-t ${IMAGE_NAME}:latest . \
 	&& docker image prune -f
-ß
+
+#	--build-arg EXPOSE_PORT=${CONTAINER_PORT} \
+
 save:
 	docker save ${IMAGE_NAME}:latest -o app.tar
 

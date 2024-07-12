@@ -3,14 +3,19 @@
 ARG FRONT_IMAGE
 ARG SERVER_1STSTAGE_IMAGE
 ARG SERVER_PROD_IMAGE
-ARG GO_OS
-ARG GO_ARCH
-ARG GO_PROD_PLATFORM
-ARG EXPOSE_PORT
+ARG PROD_OS 
+ARG PROD_ARCH
+ARG PROD_PLATFORM
+# ARG EXPOSE_PORT
+
 
 # build frontend code (copy at builder stage)
-FROM ${FRONT_IMAGE} AS frontend
+FROM ${FRONT_IMAGE} AS frontend 
+
+
 WORKDIR /app
+
+
 
 # Config Bun (不要？)
 ENV PATH="~/.bun/bin:${PATH}"
@@ -23,10 +28,33 @@ RUN bun install
 COPY ./client .
 RUN bunx --bun vite build
 
+# クライアントサイドに必要な環境変数が埋め込まれているか確認
+# デバッグ
+# CMD ["tail", "-f", "/dev/null"]
+
+
 # golang app for 1st building step
 ARG SERVER_1STSTAGE_IMAGE
-ARG GO_OS
-ARG GO_ARCH
+ARG PROD_OS
+ARG PROD_ARCH
+ARG PROD_PLATFORM
+
+ARG DB_PROD_USER
+ARG DB_PROD_PASSWORD
+ARG DB_PORD_PORT
+ARG DB_PROD_NAME
+
+ENV DB_USER=${DB_PROD_USER}
+ENV DB_PASSWORD=${DB_PROD_PASSWORD}
+ENV DBPORT=${DB_PROD_PORT}
+ENV DB_NAME=${DB_PROD_NAME}
+ENV GIN_MODE=release
+ENV GO_APP_PORT=${GO_APP_PORT}
+# ENV GO_APP_PORT=${GO_APP_PROD_PORT}
+ENV ENTRA_CLIENT_ID=${ENTRA_CLIENT_ID}
+ENV CLIENT_SECRET=${ENTRA_CLIENT_SECRET}
+ENV TENANT_ID=${ENTRA_TENANT_ID}
+
 FROM ${SERVER_1STSTAGE_IMAGE} AS builder
 
 WORKDIR /app
@@ -42,15 +70,18 @@ COPY --from=frontend /app/dist /app/static
 
 # 1st building
 # *本番環境にあわせる
-RUN GOOS=${GO_OS} GOARCH=${GO_ARCH} go build -trimpath -ldflags "-w -s" -o main /app/main.go
+
+RUN GOOS=${PROD_OS} GOARCH=${PROD_ARCH} go build -trimpath -ldflags "-w -s" -o main ./main.go
 
 # 2nd building step, merge frontend code
 ARG SERVER_PROD_IMAGE
-ARG GO_PROD_PLATFORM
-ARG EXPOSE_PORT
+ARG PROD_PLATFORM
+# ARG EXPOSE_PORT
 
 
-FROM --platform=${GO_PROD_PLATFORM} ${SERVER_PROD_IMAGE} AS production
+# FROM --platform=${PROD_PLATFORM} ${SERVER_PROD_IMAGE} AS production
+# ↑の仮でローカルでやる
+FROM --platform=arm64 golang:1.22.4-bullseye AS production
 
 
 # FROM ${SERVER_PROD_IMAGE} AS production
@@ -58,5 +89,6 @@ WORKDIR /app
 COPY --from=builder /app/main .
 # COPY .env . TODO: secretsとかを使いたい TODO: secretsはさほど意味ないらしい？
 
-EXPOSE ${EXPOSE_PORT}
+# EXPOSE ${EXPOSE_PORT} 不要？
+# CMD [ "GIN_MODE=release /app/main" ]
 CMD [ "/app/main" ]
