@@ -5,6 +5,7 @@
 # myapp
 tmp
 *.tar
+*.csv
 
 # Binaries for programs and plugins
 *.exe
