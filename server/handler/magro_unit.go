@@ -14,6 +14,7 @@ type MaGROUnitList struct {
 }
 
 func (lu *MaGROUnitList) ListUnit(ctx *gin.Context) {
+	fmt.Println("ここはハンドラー")
 	units, err := lu.Service.ListUnit(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -45,10 +46,11 @@ func (lu *MaGROUnitList) ListUnit(ctx *gin.Context) {
 
 	resp := &entity.RespBelongUnits{
 		Result:    entity.OK,
+		Message:   "",
 		UnitCount: len(units),
 		Units:     units,
 	}
-	ctx.JSON(http.StatusAccepted, resp)
+	ctx.JSON(http.StatusOK, resp)
 	return
 
 }
@@ -57,7 +59,7 @@ func (lu *MaGROUnitList) ListUsersSubunit(ctx *gin.Context) {
 	unit_id := ctx.Param("unit")
 
 	int_unit_id, err := strconv.Atoi(unit_id)
-	if err != nil{
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"status":  entity.ER,
 			"message": err.Error(),

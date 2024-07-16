@@ -2,24 +2,33 @@
 # https://docs.github.com/en/actions/creating-actions/dockerfile-support-for-github-actions#from
 ARG FRONT_IMAGE
 ARG SERVER_1STSTAGE_IMAGE
-ARG SERVER_PROD_IMAGE
-ARG PROD_OS 
-ARG PROD_ARCH
-ARG PROD_PLATFORM
-# ARG EXPOSE_PORT
-
+ARG SERVER_IMAGE
+ARG OS 
+ARG ARCH
+ARG PLATFORM
+# ARG CLIENT_SECRET ここでは不要？
+# ARG EXPOSE_PORT　不要？
 
 # build frontend code (copy at builder stage)
 FROM ${FRONT_IMAGE} AS frontend 
 
+# FROMのあとに設定しないと空になった
+ARG ENTRA_CLIENT_ID
+ARG ENTRA_TENANT_ID
+ARG ENTRA_REDIRECT_URI
+ARG URI
+
+ENV VITE_CLIENT_ID=${ENTRA_CLIENT_ID}
+ENV VITE_AUTHORITY=${ENTRA_TENANT_ID}
+ENV VITE_REDIRECT_URI=${ENTRA_REDIRECT_URI}
+ENV VITE_URI=${URI}
 
 WORKDIR /app
-
-
 
 # Config Bun (不要？)
 ENV PATH="~/.bun/bin:${PATH}"
 RUN ln -s /usr/local/bin/bun /usr/local/bin/node
+
 
 # 同じ内容ならキャッシュが効くので同じ内容になりやすそうな操作はステップを分ける
 COPY ./client/package.json .
@@ -28,20 +37,21 @@ RUN bun install
 COPY ./client .
 RUN bunx --bun vite build
 
-# クライアントサイドに必要な環境変数が埋め込まれているか確認
-# デバッグ
+# デバッグ用
 # CMD ["tail", "-f", "/dev/null"]
 
 
 # golang app for 1st building step
 ARG SERVER_1STSTAGE_IMAGE
-ARG PROD_OS
-ARG PROD_ARCH
-ARG PROD_PLATFORM
+ARG OS
+ARG ARCH
+ARG PLATFORM
+ARG GO_APP_PROD_PORT
+ARG CLIENT_SECRET
 
 ARG DB_PROD_USER
 ARG DB_PROD_PASSWORD
-ARG DB_PORD_PORT
+ARG DB_PROD_PORT
 ARG DB_PROD_NAME
 
 ENV DB_USER=${DB_PROD_USER}
@@ -49,13 +59,13 @@ ENV DB_PASSWORD=${DB_PROD_PASSWORD}
 ENV DBPORT=${DB_PROD_PORT}
 ENV DB_NAME=${DB_PROD_NAME}
 ENV GIN_MODE=release
-ENV GO_APP_PORT=${GO_APP_PORT}
-# ENV GO_APP_PORT=${GO_APP_PROD_PORT}
-ENV ENTRA_CLIENT_ID=${ENTRA_CLIENT_ID}
-ENV CLIENT_SECRET=${ENTRA_CLIENT_SECRET}
+ENV GO_APP_PORT=${GO_APP_PROD_PORT}
+ENV ENTRA_CLIENT_ID=${ENTRA_CLIENT_PROD_ID}
+ENV CLIENT_SECRET=${CLIENT_SECRET}
 ENV TENANT_ID=${ENTRA_TENANT_ID}
 
 FROM ${SERVER_1STSTAGE_IMAGE} AS builder
+
 
 WORKDIR /app
 
@@ -63,32 +73,36 @@ WORKDIR /app
 COPY ./server/go.mod* ./server/go.sum* ./
 RUN go mod download
 COPY ./server .
-COPY . .
+# ↓不要？
+# COPY . .
 
 # using frontend built code
 COPY --from=frontend /app/dist /app/static
 
 # 1st building
 # *本番環境にあわせる
+# ローカルテスト用
+RUN go build -trimpath -ldflags "-w -s" -o main ./main.go
+# RUN GOOS=${OS} GOARCH=${ARCH} go build -trimpath -ldflags "-w -s" -o main ./main.go
 
-RUN GOOS=${PROD_OS} GOARCH=${PROD_ARCH} go build -trimpath -ldflags "-w -s" -o main ./main.go
 
 # 2nd building step, merge frontend code
-ARG SERVER_PROD_IMAGE
-ARG PROD_PLATFORM
-# ARG EXPOSE_PORT
+ARG SERVER_IMAGE
+ARG PLATFORM
 
 
-# FROM --platform=${PROD_PLATFORM} ${SERVER_PROD_IMAGE} AS production
-# ↑の仮でローカルでやる
+# FROM --platform=${PLATFORM} ${SERVER_IMAGE} AS production
+# いったん仮でローカルテストする用
 FROM --platform=arm64 golang:1.22.4-bullseye AS production
 
 
-# FROM ${SERVER_PROD_IMAGE} AS production
+
 WORKDIR /app
 COPY --from=builder /app/main .
 # COPY .env . TODO: secretsとかを使いたい TODO: secretsはさほど意味ないらしい？
 
-# EXPOSE ${EXPOSE_PORT} 不要？
-# CMD [ "GIN_MODE=release /app/main" ]
+
+# デバッグ用
+# ENTRYPOINT ["/bin/sh", "-c", "while :; do sleep 10; done"]
+
 CMD [ "/app/main" ]

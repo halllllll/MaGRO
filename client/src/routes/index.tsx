@@ -18,7 +18,6 @@ import { RepeatIcon } from '@chakra-ui/icons';
 const Component: FC = () => {
   const { IdToken, userId, acquireTokenSilent } = useEntraAuth();
   const navigate = useNavigate({ from: '/login' });
-
   // TODO: エラーハンドリング
   const { data } = useGetBelongingUnits({
     userId: userId,
@@ -50,7 +49,7 @@ const Component: FC = () => {
   }
 
   if (data?.status === 'error') {
-    throw new Error('something error');
+    throw new Error(data.message);
   }
   // TODO: 選択肢がひとつの場合はそのままリダイレクトしたいが、
   // なぜかエラーが解決できないので、とりあえず単一であっても候補を選ばせることにする

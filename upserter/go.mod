@@ -1,16 +1,16 @@
 module github.com/halllllll/MaGRO/kajiki
 
-go 1.22.3
+go 1.22.4
 
 require (
-	github.com/caarlos0/env/v11 v11.0.1
+	github.com/caarlos0/env/v11 v11.1.0
+	github.com/cheggaaa/pb/v3 v3.1.5
 	github.com/jackc/pgx/v5 v5.6.0
 	github.com/shigetaichi/xsv v1.2.1
 )
 
 require (
 	github.com/VividCortex/ewma v1.2.0 // indirect
-	github.com/cheggaaa/pb/v3 v3.1.5 // indirect
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect

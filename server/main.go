@@ -12,13 +12,16 @@ import (
 	"syscall"
 	"time"
 
+	gin_static "github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/halllllll/MaGRO/auth"
 	"github.com/halllllll/MaGRO/config"
 	"github.com/halllllll/MaGRO/handler"
 	"github.com/halllllll/MaGRO/service"
 	"github.com/halllllll/MaGRO/store"
-	gin_static "github.com/soulteary/gin-static"
+
+	// gin_static "github.com/soulteary/gin-static"
+
 	"golang.org/x/sync/errgroup"
 )
 
@@ -41,7 +44,6 @@ func main() {
 	if err := run(context.Background()); err != nil {
 		log.Printf("failed to terminate server: %+v", err)
 	}
-
 }
 
 type Ping struct {
@@ -61,6 +63,7 @@ func run(ctx context.Context) error {
 	if err != nil {
 		log.Fatalf("failed to listen port: %d: %+v", cfg.Port, err)
 	}
+
 	mux, cleanup, err := NewMux(ctx, cfg)
 	defer cleanup()
 	if err != nil {
@@ -117,12 +120,10 @@ func NewMux(ctx context.Context, cfg *config.Config) (http.Handler, func(), erro
 	// https://zenn.dev/leaner_dev/articles/20210930-rails-api-spa-csrf
 	// https://kimuson.dev/blog/%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E3%82%A8%E3%83%B3%E3%83%89/csrf_spa/
 	// むしろ不要な気がしている
-
 	dbPool, cleanup, err := store.NewPool(ctx, cfg)
 	if err != nil {
 		return nil, cleanup, err
 	}
-
 	repo := store.NewRepository(dbPool)
 	at := handler.AddTask{
 		Service: &service.AddTask{
@@ -130,12 +131,30 @@ func NewMux(ctx context.Context, cfg *config.Config) (http.Handler, func(), erro
 		},
 	}
 
-	router.Use(gin_static.ServeEmbed("static", static))
+	router.Use(gin_static.Serve("/", gin_static.EmbedFolder(static, "static")))
 
 	router.GET("/health", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
 			"status": "ok",
 		})
+	})
+
+	router.GET("/redirect", func(ctx *gin.Context) {
+		fmt.Println("👹　ここはredirect")
+		fmt.Printf("request👺: %#v\n", ctx.Request)
+		// fmt.Printf("uri: %s\n", ctx.Request.RequestURI)
+		// ctx.Request.URL.Path = "/"
+		// router.HandleContext(ctx)
+		ctx.Redirect(http.StatusFound, "/")
+	})
+
+	router.GET("/login", func(ctx *gin.Context) {
+		fmt.Println("🍊　ここはlogin")
+		fmt.Printf("request: %#v\n", ctx.Request)
+		// fmt.Printf("uri: %s\n", ctx.Request.RequestURI)
+		// ctx.Request.URL.Path = "/"
+		// router.HandleContext(ctx)
+		ctx.Redirect(http.StatusOK, "/")
 	})
 
 	router.POST("/tasks", at.AddTask)

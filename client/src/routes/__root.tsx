@@ -1,5 +1,4 @@
-import { createRootRouteWithContext, Navigate, Outlet } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/router-devtools';
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
 import { Header } from '@/routes/-components/Header';
 import { Box, Container, Flex, VStack, Text } from '@chakra-ui/react';
 import { Footer } from '@/routes/-components/Footer';
@@ -11,6 +10,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from '@/components/ErrorFollback';
 import { MsalProcess } from '@/components/MsalProcess';
 import type { useEntraAuth } from '@/hooks/entraAuth';
+import { TanStackRouterDevtools } from '@tanstack/router-devtools';
 
 interface RouterContext {
   azAuth: ReturnType<typeof useEntraAuth>;
@@ -35,7 +35,7 @@ const RootComponent: FC = () => {
             <MsalProcess />
             <UnauthenticatedTemplate>
               <Box>
-                <Navigate to="/login" />
+                {/* <Navigate to="/login" /> */}
                 <Text as="i">
                   "MaGRO" is{' '}
                   <ruby>
@@ -60,7 +60,7 @@ const RootComponent: FC = () => {
           </Box>
         </Container>
         <Footer />
-        <TanStackRouterDevtools />
+        {import.meta.env.DEV && <TanStackRouterDevtools />}
       </VStack>
     </Flex>
   );

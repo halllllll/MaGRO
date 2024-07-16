@@ -3,10 +3,11 @@ import type { Unit } from '@/entity/Unit';
 export type BelongUnitsResponse =
   | {
       status: 'error';
-      message: 'string';
+      message: string;
     }
   | {
       status: 'success';
+      message: string;
       unit_count: number;
       units: Unit[];
     };

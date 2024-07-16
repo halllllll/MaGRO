@@ -2,20 +2,21 @@ package config
 
 import "github.com/caarlos0/env/v11"
 
-// TODO: 不要
-type Env string
+type ServiceName string
 
 const (
-	EnvDevelopment Env = "dev"
-	EnvProductin   Env = "prod"
+	ServiceLgate    ServiceName = "lgate"
+	ServiceLoilo    ServiceName = "loilo"
+	SeriveMiraiseed ServiceName = "miraiseed"
 )
 
 type Config struct {
-	Env        Env    `env:"MAGRO_ENV" envDefault:"dev"`
 	DBPort     int    `env:"DBPORT,required"`
 	DBUser     string `env:"DB_USER,required"`
 	DBPassword string `env:"DB_PASSWORD,required"`
-	DBName     string `env:"DB_NAME,required"`
+	// DBHost string `env:"DB_HOSTNAME,required"`
+	DBName  string      `env:"DB_NAME,required"`
+	Service ServiceName `env:"SERVICE,required"`
 }
 
 func NewConfig() (*Config, error) {

@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/halllllll/MaGRO/kajiki/config"
 	service_reader "github.com/halllllll/MaGRO/kajiki/reader"
 	"github.com/halllllll/MaGRO/kajiki/store"
 	"github.com/halllllll/MaGRO/kajiki/upsert"
@@ -17,21 +17,29 @@ import (
 func main() {
 	var dsn string
 	var csvfilepath string
-	var service string
-	flag.StringVar(&dsn, "dsn", "", "connect to postgresql database. ex) 'postgres://<user>:<password>@<host>:<port>/<database name>'")
-	flag.StringVar(&service, "service", "", "target service: 'lgate', 'loilo', 'c4th', 'miraiseed'")
-	flag.StringVar(&csvfilepath, "csv", "", "csv file path based on Format")
-	flag.Parse()
+
+	csvfilepath = "./files/data.csv"
 
 	f, err := os.Open(csvfilepath)
 	if err != nil {
+		log.Println("failed to open csv file. if using docker container, should bind or mount ex")
 		log.Fatal(err)
 	}
 	defer f.Close()
+	// config
+	cfg, err := config.NewConfig()
+	if err != nil {
+		log.Println("can't load env vars")
+		log.Fatal(err)
+	}
+	// ex) 'postgres://<user>:<password>@<host>:<port>/<database name>'
+	dsn = fmt.Sprintf("postgres://%s:%s@%s:%d/%s", cfg.DBUser, cfg.DBPassword, "db", cfg.DBPort, cfg.DBName)
+
 	ctx := context.Background()
 
 	pool, close, err := store.NewDB(ctx, dsn)
 	if err != nil {
+		log.Println("failed to connect db")
 		log.Fatal(err)
 	}
 	defer close()
@@ -41,7 +49,7 @@ func main() {
 	// if err := upsert.Hoge(ctx); err != nil {
 	// 	log.Fatal(err)
 	// }
-	format := service_reader.Format(strings.ToLower(service))
+	format := service_reader.Format(strings.ToLower(string(cfg.Service)))
 	reader := service_reader.NewReader(upsert)
 	start := time.Now()
 	switch format {
@@ -54,5 +62,5 @@ func main() {
 	}
 	end := time.Now()
 	millisconde := end.Sub(start).Milliseconds()
-	fmt.Printf("done: time - %d (msec)", millisconde)
+	log.Printf("done: time - %d (msec)", millisconde)
 }

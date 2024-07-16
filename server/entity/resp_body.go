@@ -29,6 +29,7 @@ type RespUsersSubunit struct {
 
 type RespBelongUnits struct {
 	Result    ResultLabel `json:"status"`
+	Message   string      `json:"message"`
 	Units     []*Unit     `json:"units"`
 	UnitCount int         `json:"unit_count"`
 }

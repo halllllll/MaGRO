@@ -2,10 +2,12 @@ package auth
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/halllllll/MaGRO/entity"
+	"github.com/jackc/pgx/v5"
 )
 
 type roleKey struct{}
@@ -38,9 +40,19 @@ func (er *ensureRegularAccount) EnsureRegularAccountMiddleWare() gin.HandlerFunc
 		role, err := er.db.GetRole(ctx, &userid)
 		// 直接dbから帰ってきてるerr
 		if err != nil {
+			fmt.Printf("DB Error: %s -  %s\n", userid, err.Error())
+			if err == pgx.ErrNoRows {
+				fmt.Println("error no rows")
+				ctx.JSON(http.StatusOK, gin.H{
+					"status":  entity.ER,
+					"message": "no data",
+				})
+				ctx.Abort()
+				return
+			}
 			ctx.JSON(http.StatusInternalServerError, gin.H{
 				"status":  entity.ER,
-				"message": err.Error(),
+				"message": fmt.Errorf("DB Error"),
 			})
 			ctx.Abort()
 			return

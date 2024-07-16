@@ -14,9 +14,9 @@ services:
       DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
-      ENTRA_CLIENT_ID: ${ENTRA_CLIENT_ID} # クライアントから送られてきたIDトークンの検証に必要
+      ENTRA_CLIENT_ID: ${ENTRA_CLIENT_DEV_ID} # クライアントから送られてきたIDトークンの検証に必要
       # 👺 below 2 envs are ONLY temporary sinogi until entra app assign user manager 👹
-      CLIENT_SECRET: ${ENTRA_CLIENT_SECRET}
+      CLIENT_SECRET: ${ENTRA_CLIENT_DEV_SECRET}
       TENANT_ID: ${ENTRA_TENANT_ID}
 
     tty: true
@@ -43,6 +43,7 @@ services:
     tty: true
     volumes:
       - ../../upserter:/workspace:cached
+      - ./_tools/upserter/testdata.csv:/files/data.csv
     restart: always
   db:
     image: postgres:latest

@@ -13,8 +13,9 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// *未使用
 func New(ctx context.Context, cfg *config.Config) (db.Querier, func(), error) {
-	uri := fmt.Sprintf("postgres://%s:%s@%s:%d/%s", cfg.DBUser, cfg.DBPassword, "db", cfg.DBPort, cfg.DBName)
+	uri := fmt.Sprintf("postgres://%s:%s@%s:%d/%s", cfg.DBUser, cfg.DBPassword, "magro_db", cfg.DBPort, cfg.DBName)
 	pgxConf, err := pgxpool.ParseConfig(uri)
 	if err != nil {
 		return nil, nil, err
@@ -41,7 +42,7 @@ type Repository struct {
 
 // sqlcで生成したものに依存するんじゃなくてpgxpoolにしたほうがいいんじゃないかというやつ
 func NewPool(ctx context.Context, cfg *config.Config) (*pgxpool.Pool, func(), error) {
-	uri := fmt.Sprintf("postgres://%s:%s@%s:%d/%s", cfg.DBUser, cfg.DBPassword, "db", cfg.DBPort, cfg.DBName)
+	uri := fmt.Sprintf("postgres://%s:%s@%s:%d/%s", cfg.DBUser, cfg.DBPassword, "magro_db", cfg.DBPort, cfg.DBName)
 	pgxConf, err := pgxpool.ParseConfig(uri)
 	if err != nil {
 		return nil, nil, err

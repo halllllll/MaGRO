@@ -24,7 +24,6 @@ export const getUnitsByUser = async (IdToken: string | undefined): Promise<Belon
       Authorization: `Bearer ${IdToken}`,
     },
   });
-
   if (!res.ok) {
     throw new Error(`${res.status} ${res.statusText}`);
   }

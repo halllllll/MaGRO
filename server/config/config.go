@@ -1,8 +1,6 @@
 package config
 
 import (
-	"fmt"
-
 	"github.com/caarlos0/env/v11"
 )
 
@@ -38,9 +36,6 @@ func New() (*Config, error) {
 	if err := env.Parse(cfg); err != nil {
 		return nil, err
 	}
-
-	fmt.Println("マジでPORT知りたい")
-	fmt.Printf("%d\n", cfg.Port)
 
 	return cfg, nil
 }
