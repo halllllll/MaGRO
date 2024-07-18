@@ -3,11 +3,14 @@ import type { FC, ReactNode } from 'react';
 import { BrowserCacheLocation, LogLevel, PublicClientApplication } from '@azure/msal-browser';
 import { MsalProvider } from '@azure/msal-react';
 
-export type AuthProperties = {
+// BowtherAuthOptions
+type AuthProperties = {
   auth: {
     clientId: string;
     authority: string;
     redirectUri: string;
+    postLogoutRedirectUri?: string | null;
+    navigateToLoginRequestUrl?: boolean;
   };
 };
 
@@ -52,7 +55,6 @@ export const createMsalClient = (auth: AuthProperties) => {
 };
 
 export const MsalClientProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  // const { surumeCtx } = useSurumeContext();
   const msalClient = createMsalClient({
     auth: {
       clientId: import.meta.env.VITE_CLIENT_ID ?? '',
@@ -60,6 +62,8 @@ export const MsalClientProvider: FC<{ children: ReactNode }> = ({ children }) =>
       redirectUri: import.meta.env.DEV
         ? `http://localhost:${import.meta.env.VITE_PORT}/${import.meta.env.VITE_REDIRECT_URI}`
         : `${import.meta.env.VITE_URI}/${import.meta.env.VITE_REDIRECT_URI}`,
+      navigateToLoginRequestUrl: false,
+      postLogoutRedirectUri: '/',
     },
   });
   return <MsalProvider instance={msalClient}>{children}</MsalProvider>;
