@@ -73,8 +73,6 @@ WORKDIR /app
 COPY ./server/go.mod* ./server/go.sum* ./
 RUN go mod download
 COPY ./server .
-# ↓不要？
-# COPY . .
 
 # using frontend built code
 COPY --from=frontend /app/dist /app/static
@@ -82,8 +80,8 @@ COPY --from=frontend /app/dist /app/static
 # 1st building
 # *本番環境にあわせる
 # ローカルテスト用
-RUN go build -trimpath -ldflags "-w -s" -o main ./main.go
-# RUN GOOS=${OS} GOARCH=${ARCH} go build -trimpath -ldflags "-w -s" -o main ./main.go
+# RUN go build -trimpath -ldflags "-w -s" -o main ./main.go
+RUN GOOS=${OS} GOARCH=${ARCH} go build -trimpath -ldflags "-w -s" -o main ./main.go
 
 
 # 2nd building step, merge frontend code
@@ -91,9 +89,9 @@ ARG SERVER_IMAGE
 ARG PLATFORM
 
 
-# FROM --platform=${PLATFORM} ${SERVER_IMAGE} AS production
-# いったん仮でローカルテストする用
-FROM --platform=arm64 golang:1.22.4-bullseye AS production
+FROM --platform=${PLATFORM} ${SERVER_IMAGE} AS production
+# ローカルテスト用
+# FROM --platform=arm64 golang:1.22.4-bullseye AS production
 
 
 

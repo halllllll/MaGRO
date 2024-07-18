@@ -5,8 +5,6 @@ ARG PROD_IMAGE
 ARG PLATFORM
 
 
-# 面倒なのでとりあえずマルチステージビルドはせずgo環境をそのまま使う golang:1.22.4-bullseyeとか
-
 FROM ${BUILDER_IMAGE} AS upserter
 
 WORKDIR /app
@@ -18,13 +16,12 @@ COPY ./upserter .
 
 # 1st building
 # *本番環境にあわせる
-# ローカルテスト用
 
-RUN go build -trimpath -ldflags "-w -s" -o main ./main.go
-# デバッグ用
+# デバッグ用（ローカル）
+# RUN go build -trimpath -ldflags "-w -s" -o main ./main.go
 # ENTRYPOINT ["/bin/sh", "-c", "while :; do sleep 10; done"]
 
-# RUN GOOS=${OS} GOARCH=${ARCH} go build -trimpath -ldflags "-w -s" -o main ./main.go
+RUN GOOS=${OS} GOARCH=${ARCH} go build -trimpath -ldflags "-w -s" -o main ./main.go
 
 
 # 2nd building step, merge frontend code
@@ -32,9 +29,9 @@ ARG PROD_IMAGE
 ARG PLATFORM
 
 
-# FROM --platform=${PLATFORM} ${PROD_IMAGE} AS production
-# いったん仮でローカルテストする用
-FROM --platform=arm64 golang:1.22.4-bullseye AS production
+# ローカルテスト用
+# FROM --platform=arm64 golang:1.22.4-bullseye AS production
+FROM --platform=${PLATFORM} ${PROD_IMAGE} AS production
 
 
 WORKDIR /
