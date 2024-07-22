@@ -1,0 +1,4 @@
+{
+  "markdown-mermaid.darkModeTheme": "neutral",
+  "markdown-pdf.mermaidServer": "https://unpkg.com/mermaid@10.6.0/dist/mermaid.min.js"
+}

@@ -78,7 +78,7 @@ export const useEntraAuth = () => {
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   const loginAzure = useCallback(async () => {
     if (inProgress === InteractionStatus.None) {
-      // instance.handleRedirectPromise()
+      // await instance.handleRedirectPromise(); あってもなくてもBrowserAuthError: interaction_in_progress: Interaction is currently in progress. Please ensure that this interaction has been completed before calling an interactive API.   For more visit: aka.ms/msaljs/browser-errors になる
       await instance.loginRedirect(AppRequests);
       // 成功時のコールバック
       instance.addEventCallback((eve) => {
@@ -88,6 +88,19 @@ export const useEntraAuth = () => {
       });
     }
   }, [instance]);
+
+  // const loginAzure = async () => {
+  //   await instance.handleRedirectPromise();
+  //   if (inProgress === InteractionStatus.None) {
+  //     await instance.loginRedirect(AppRequests);
+  //     // 成功時のコールバック
+  //     instance.addEventCallback((eve) => {
+  //       if (eve.eventType === EventType.LOGIN_SUCCESS) {
+  //         setupTokenExpirationTimer();
+  //       }
+  //     });
+  //   }
+  // };
 
   // TODO: will back when get userhomeid and replace ↑
   // const logoutAzure = useCallback(
